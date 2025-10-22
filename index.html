@@ -1,235 +1,164 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<meta charset="utf-8"/>
-<title>Weather Forecast</title>
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  overflow-x: auto;
-  display: block;
-}
-
-/* Responsive text and spacing */
-td, th {
-  padding: 8px;
-  font-size: 2rem;
-  word-wrap: break-word;
-}
-
-/* Header styling */
-#header-row {
-  background-color: #dddddd;
-}
-
-/* Zebra striping for rows */
-tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-/* Responsive layout for small screens */
-@media screen and (max-width: 768px) {
-  table, thead, tbody, th, td, tr {
-    display: block;
-  }
-
-  thead {
-    display: none;
-  }
-
-  tr {
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    padding: 0.5rem;
-  }
-
-  td {
-    position: relative;
-    padding-left: 50%;
-    text-align: left;
-  }
-
-  td::before {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    width: 45%;
-    white-space: nowrap;
-    font-weight: bold;
-  }
-
-  /* Add labels for each column */
-  td:nth-of-type(1)::before { content: "Date"; }
-  td:nth-of-type(2)::before { content: "Location"; }
-  td:nth-of-type(3)::before { content: "Min Temp."; }
-  td:nth-of-type(4)::before { content: "Max Temp."; }
-  td:nth-of-type(5)::before { content: "Rain %"; }
-  td:nth-of-type(6)::before { content: "Rain Total"; }
-}
-</style>
+  <title>Weather Forecast</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    .row-stripe {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    td {
+      min-width: 75px;
+    }
+    .center {
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-<h1 style="font-size: 4rem; text-align: center;">Weather Forecasts</h1>
-<div id="alert"></div>
-<table style="width:100%">
-  <tr id="header-row">
-    <th>Date</th>
-    <th>Location</th>
-    <th>Min Temp.</th>
-    <th>Max Temp.</th>
-    <th>Rain %</th>
-    <th>Rain Total</th>
-  </tr>
-  <tr>
-    <td rowspan="2">11/1</td>
-    <td>Rome, Italy</td>
-    <td id="minTemp_rome"></td>
-    <td id="maxTemp_rome"></td>
-    <td id="precipProb_rome"></td>
-    <td id="precipitation_rome"></td>
-  </tr>
-  <tr>
-    <td>
-      <i>Civitavecchia</i>
-    </td>
-    <td id="minTemp_civit"></td>
-    <td id="maxTemp_civit"></td>
-    <td id="precipProb_civit"></td>
-    <td id="precipitation_civit"></td>
-  </tr>
-  <tr>
-    <td rowspan="2">11/2</td>
-    <td>Florence, Italy</td>
-    <td id="minTemp_florence"></td>
-    <td id="maxTemp_florence"></td>
-    <td id="precipProb_florence"></td>
-    <td id="precipitation_florence"></td>
-  </tr>
-  <tr>
-    <td>
-      <i>Livorno</i>
-    </td>
-    <td id="minTemp_livorno"></td>
-    <td id="maxTemp_livorno"></td>
-    <td id="precipProb_livorno"></td>
-    <td id="precipitation_livorno"></td>
-  </tr>
-  <tr>
-    <td>11/3</td>
-    <td>Naples, Italy</td>
-    <td id="minTemp_naples"></td>
-    <td id="maxTemp_naples"></td>
-    <td id="precipProb_naples"></td>
-    <td id="precipitation_naples"></td>
-  </tr>
-  <tr>
-    <td>11/4</td>
-    <td>Siracusa (Sicily), Italy</td>
-    <td id="minTemp_siracusa"></td>
-    <td id="maxTemp_siracusa"></td>
-    <td id="precipProb_siracusa"></td>
-    <td id="precipitation_siracusa"></td>
-  </tr>
-  <tr>
-    <td>11/5</td>
-    <td>(at sea)</td>
-    <td> - </td>
-    <td> - </td>
-    <td> - </td>
-    <td> - </td>
-  </tr>
-  <tr>
-    <td>11/6</td>
-    <td>Ibiza, Spain</td>
-    <td id="minTemp_ibiza"></td>
-    <td id="maxTemp_ibiza"></td>
-    <td id="precipProb_ibiza"></td>
-    <td id="precipitation_ibiza"></td>
-  </tr>
-  <tr>
-    <td>11/7</td>
-    <td>Barcelona, Spain</td>
-    <td id="minTemp_barcelona"></td>
-    <td id="maxTemp_barcelona"></td>
-    <td id="precipProb_barcelona"></td>
-    <td id="precipitation_barcelona"></td>
-  </tr>
-  <tr>
-    <td>11/8</td>
-    <td>Cartagena, Spain</td>
-    <td id="minTemp_cartagena"></td>
-    <td id="maxTemp_cartagena"></td>
-    <td id="precipProb_cartagena"></td>
-    <td id="precipitation_cartagena"></td>
-  </tr>
-  <tr>
-    <td rowspan="2">11/9</td>
-    <td>Granada, Spain</td>
-    <td id="minTemp_granada"></td>
-    <td id="maxTemp_granada"></td>
-    <td id="precipProb_granada"></td>
-    <td id="precipitation_granada"></td>
-  </tr>
-  <tr>
-    <td>
-      <i>Malaga</i>
-    </td>
-    <td id="minTemp_malaga"></td>
-    <td id="maxTemp_malaga"></td>
-    <td id="precipProb_malaga"></td>
-    <td id="precipitation_malaga"></td>
-  </tr>
-  <tr>
-    <td rowspan="2">11/10</td>
-    <td>Seville, Spain</td>
-    <td id="minTemp_seville"></td>
-    <td id="maxTemp_seville"></td>
-    <td id="precipProb_seville"></td>
-    <td id="precipitation_seville"></td>
-  </tr>
-  <tr>
-    <td>
-      <i>Cadiz</i>
-    </td>
-    <td id="minTemp_cadiz"></td>
-    <td id="maxTemp_cadiz"></td>
-    <td id="precipProb_cadiz"></td>
-    <td id="precipitation_cadiz"></td>
-  </tr>
-  <tr>
-    <td>11/11</td>
-    <td>Tangier, Morocco</td>
-    <td id="minTemp_tangier"></td>
-    <td id="maxTemp_tangier"></td>
-    <td id="precipProb_tangier"></td>
-    <td id="precipitation_tangier"></td>
-  </tr>
-  <tr>
-    <td>11/12</td>
-    <td>(at sea)</td>
-    <td> - </td>
-    <td> - </td>
-    <td> - </td>
-    <td> - </td>
-  </tr>
-  <tr>
-    <td>11/13</td>
-    <td>Lisbon, Portugal</td>
-    <td id="minTemp_lisbon"></td>
-    <td id="maxTemp_lisbon"></td>
-    <td id="precipProb_lisbon"></td>
-    <td id="precipitation_lisbon"></td>
-  </tr>
-</table>
+
+<div class="container-fluid">
+  <h1 class="center" style="width: 100%;">Weather Forecast</h1>
+
+  <div class="center" style="width: 100%;">
+    <p>Current Time in Europe: <span id="rome-timeAMPM"></span></p>
+  </div>
+  
+  <table class="table table-bordered">
+    <thead>
+      <tr style="text-align: center;">
+        <th scope="col">Date</th>
+        <th scope="col">Location</th>
+        <th scope="col">Temp</th>
+        <th scope="col">Precip</th>
+        <th scope="col">Wind Gusts</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row-stripe">
+        <th rowspan="2" scope="row">11/1</th>
+        <td>Rome, Italy</td>
+        <td class="center" id="temp_rome"></td>
+        <td class="center" id="precip_rome"></td>
+        <td class="center" id="wind_rome"></td>
+      </tr>
+      <tr class="row-stripe">
+        <td><i>Civitavecchia</i></td>
+        <td class="center" id="temp_civit"></td>
+        <td class="center" id="precip_civit"></td>
+        <td class="center" id="wind_civit"></td>
+      </tr>
+      <tr>
+        <th rowspan="2" scope="row">11/2</th>
+        <td>Florence, Italy</td>
+        <td class="center" id="temp_florence"></td>
+        <td class="center" id="precip_florence"></td>
+        <td class="center" id="wind_florence"></td>
+      </tr>
+      <tr>
+        <td><i>Livorno</i></td>
+        <td class="center" id="temp_livorno"></td>
+        <td class="center" id="precip_livorno"></td>
+        <td class="center" id="wind_livorno"></td>
+      </tr>
+      <tr class="row-stripe">
+        <th rowspan="2" scope="row">11/3</td>
+        <td>Naples, Italy</td>
+        <td class="center" id="temp_naples"></td>
+        <td class="center" id="precip_naples"></td>
+        <td class="center" id="wind_naples"></td>
+      </tr>
+      <tr>
+      <tr>
+        <th>11/4</th>
+        <td>Siracusa, Italy</td>
+        <td class="center" id="temp_siracusa"></td>
+        <td class="center" id="precip_siracusa"></td>
+        <td class="center" id="wind_siracusa"></td>
+      </tr>
+      <tr class="row-stripe">
+        <th>11/5</th>
+        <td>(at sea)</td>
+        <td> - </td>
+        <td> - </td>
+        <td> - </td>
+      </tr>
+      <tr>
+        <th>11/6</th>
+        <td>Ibiza, Spain</td>
+        <td class="center" id="temp_ibiza"></td>
+        <td class="center" id="precip_ibiza"></td>
+        <td class="center" id="wind_ibiza"></td>
+      </tr>
+      <tr class="row-stripe">
+        <th>11/7</th>
+        <td>Barcelona, Spain</td>
+        <td class="center" id="temp_barcelona"></td>
+        <td class="center" id="precip_barcelona"></td>
+        <td class="center" id="wind_barcelona"></td>
+      </tr>
+      <tr>
+        <th>11/8</th>
+        <td>Cartagena, Spain</td>
+        <td class="center" id="temp_cartagena"></td>
+        <td class="center" id="precip_cartagena"></td>
+        <td class="center" id="wind_cartagena"></td>
+      </tr>
+      <tr class="row-stripe">
+        <th rowspan="2">11/9</th>
+        <td>Granada, Spain</td>
+        <td class="center" id="temp_granada"></td>
+        <td class="center" id="precip_granada"></td>
+        <td class="center" id="wind_granada"></td>
+      </tr>
+      <tr class="row-stripe">
+        <td><i>Malaga</i></td>
+        <td class="center" id="temp_malaga"></td>
+        <td class="center" id="precip_malaga"></td>
+        <td class="center" id="wind_malaga"></td>
+      </tr>
+      <tr>
+        <th rowspan="2">11/10</th>
+        <td>Seville, Spain</td>
+        <td class="center" id="temp_seville"></td>
+        <td class="center" id="precip_seville"></td>
+        <td class="center" id="wind_seville"></td>
+      </tr>
+      <tr>
+        <td><i>Cadiz</i></td>
+        <td class="center" id="temp_cadiz"></td>
+        <td class="center" id="precip_cadiz"></td>
+        <td class="center" id="wind_cadiz"></td>
+      </tr>
+      <tr class="row-stripe">
+        <th>11/11</th>
+        <td>Tangier, Morocco</td>
+        <td class="center" id="temp_tangier"></td>
+        <td class="center" id="precip_tangier"></td>
+        <td class="center" id="wind_tangier"></td>
+      </tr>
+      <tr>
+        <th>11/12</th>
+        <td>(at sea)</td>
+        <td> - </td>
+        <td> - </td>
+        <td> - </td>
+      </tr>
+      <tr class="row-stripe">
+        <th>11/13</th>
+        <td>Lisbon, Portugal</td>
+        <td class="center" id="temp_lisbon"></td>
+        <td class="center" id="precip_lisbon"></td>
+        <td class="center" id="wind_lisbon"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <script>
 // List out all of the destinations and their corresponding API calls including date
@@ -237,65 +166,66 @@ tr:nth-child(even) {
 const destinations = [
   {
     city: "rome",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.8971&longitude=12.4824&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.8971&longitude=12.4824&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
   },
   {
     city: "civit",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=42.0941&longitude=11.7930&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=42.0941&longitude=11.7930&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
   },
   {
     city: "florence",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.7699&longitude=11.2556&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.7699&longitude=11.2556&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
   },
   {
     city: "livorno",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.5827&longitude=10.3286&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.5827&longitude=10.3286&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
   },
   {
     city: "naples",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=40.8391&longitude=14.2456&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-03&end_date=2025-11-03"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=40.8391&longitude=14.2456&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-03&end_date=2025-11-03"
   },
   {
     city: "siracusa",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.0745&longitude=15.2856&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-04&end_date=2025-11-04"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.0745&longitude=15.2856&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-04&end_date=2025-11-04"
   },
   {
     city: "ibiza",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.9092&longitude=1.4284&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-06&end_date=2025-11-06"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.9092&longitude=1.4284&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-06&end_date=2025-11-06"
   },
   {
     city: "barcelona",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.3939&longitude=2.1897&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-07&end_date=2025-11-07"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.3939&longitude=2.1897&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-07&end_date=2025-11-07"
   },
   {
     city: "cartagena",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.6051&longitude=-0.9859&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-08&end_date=2025-11-08"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.6051&longitude=-0.9859&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-08&end_date=2025-11-08"
   },
   {
     city: "granada",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.1849&longitude=-3.6028&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.1849&longitude=-3.6028&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
   },
   {
     city: "malaga",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.7195&longitude=-4.4225&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.7195&longitude=-4.4225&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
   },
   {
     city: "seville",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.3879&longitude=-5.9791&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.3879&longitude=-5.9791&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
   },
   {
     city: "cadiz",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.5144&longitude=-6.2744&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.5144&longitude=-6.2744&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
   },
   {
     city: "tangier",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=35.7879&longitude=-5.8097&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-11&end_date=2025-11-11"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=35.7879&longitude=-5.8097&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-11&end_date=2025-11-11"
   },
   {
     city: "lisbon",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.7123&longitude=-9.1277&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=Europe/Rome&start_date=2025-11-13&end_date=2025-11-13"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.7123&longitude=-9.1277&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-13&end_date=2025-11-13"
   }
 ];
+
 
 function fetchWeatherData({ city, apiUrl }) {
   fetch(apiUrl)
@@ -304,26 +234,56 @@ function fetchWeatherData({ city, apiUrl }) {
       return response.json();
     })
     .then(data => {
-      const max = data.daily?.temperature_2m_max?.[0] ?? "-";
-      const min = data.daily?.temperature_2m_min?.[0] ?? "-";
-      const rain = data.daily?.precipitation_sum?.[0] ?? "-";
+      const max = Math.round(data.daily?.temperature_2m_max?.[0] ?? "-");
+      const min = Math.round(data.daily?.temperature_2m_min?.[0] ?? "-");
+      const rawRain = data.daily?.precipitation_sum?.[0];
+      const rain = rawRain !== undefined ? Math.round(rawRain * 10) / 10 : "-";
       const rainProb = data.daily?.precipitation_probability_max?.[0] ?? "-";
+      const gust = Math.round(data.daily?.windgusts_10m_max?.[0] ?? "-");
 
-      document.getElementById(`minTemp_${city}`).textContent = `${min} °F`;
-      document.getElementById(`maxTemp_${city}`).textContent = `${max} °F`;
-      document.getElementById(`precipProb_${city}`).textContent = `${rainProb} %`;
-      document.getElementById(`precipitation_${city}`).textContent = `${rain} in.`;
+      document.getElementById(`temp_${city}`).innerHTML = `${min}°F</br>${max}°F`;
+      document.getElementById(`precip_${city}`).innerHTML = `${rainProb}%</br>(${rain} in)`;
+      document.getElementById(`wind_${city}`).textContent = `${gust} mph`;
     })
     .catch(error => {
       console.error(`Error loading forecast for ${city}:`, error.message);
-      document.getElementById(`minTemp_${city}`).textContent = "- °F";
-      document.getElementById(`maxTemp_${city}`).textContent = "- °F";
-      document.getElementById(`precipProb_${city}`).textContent = "- %";
-      document.getElementById(`precipitation_${city}`).textContent = "- in.";
+      document.getElementById(`temp_${city}`).textContent = `- °F`;
+      document.getElementById(`precip_${city}`).textContent = `- % (- in)`;
+      document.getElementById(`wind_${city}`).textContent = `- mph`;
     });
 }
-
 destinations.forEach(fetchWeatherData);
+
+
+// Display the current time in Europe (Rome time zone)
+function updateRomeTime() {
+  const now = new Date();
+
+  const options24 = {
+    timeZone: 'Europe/Rome',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  };
+
+  const optionsAMPM = {
+    timeZone: 'Europe/Rome',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+
+  const formatter24 = new Intl.DateTimeFormat('en-GB', options24);
+  const formatterAMPM = new Intl.DateTimeFormat('en-GB', optionsAMPM);
+
+  // Display both formats
+  //document.getElementById('rome-time').textContent = formatterAMPM.format(now);
+  document.getElementById('rome-timeAMPM').textContent = `${formatterAMPM.format(now)} (${formatter24.format(now)})`;
+}
+// Update every second
+setInterval(updateRomeTime, 1000);
+
+
 
 // Select the current day's line in the table
 var today = new Date();
@@ -334,10 +294,12 @@ var todayDate = month + '/' + day;
 
 console.log("Looking for date:", todayDate);
 
-$("td").filter(function() {
+$("th").filter(function() {
     return $(this).text().trim() === todayDate;
-}).closest("tr").css("background-color", "#ffeb3b");
+}).closest("tr").css("background-color", "#7EB752");
 
 </script>
+
 </body>
 </html>
+        
