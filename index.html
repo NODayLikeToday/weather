@@ -18,6 +18,9 @@
     .center {
       text-align: center;
     }
+    .small-text {
+      font-size: 65%;
+    }
   </style>
 </head>
 <body>
@@ -166,63 +169,63 @@
 const destinations = [
   {
     city: "rome",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.8971&longitude=12.4824&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.8971&longitude=12.4824&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
   },
   {
     city: "civit",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=42.0941&longitude=11.7930&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=42.0941&longitude=11.7930&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
   },
   {
     city: "florence",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.7699&longitude=11.2556&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.7699&longitude=11.2556&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
   },
   {
     city: "livorno",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.5827&longitude=10.3286&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.5827&longitude=10.3286&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
   },
   {
     city: "naples",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=40.8391&longitude=14.2456&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-03&end_date=2025-11-03"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=40.8391&longitude=14.2456&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-03&end_date=2025-11-03"
   },
   {
     city: "siracusa",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.0745&longitude=15.2856&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-04&end_date=2025-11-04"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.0745&longitude=15.2856&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-04&end_date=2025-11-04"
   },
   {
     city: "ibiza",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.9092&longitude=1.4284&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-06&end_date=2025-11-06"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.9092&longitude=1.4284&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-06&end_date=2025-11-06"
   },
   {
     city: "barcelona",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.3939&longitude=2.1897&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-07&end_date=2025-11-07"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.3939&longitude=2.1897&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-07&end_date=2025-11-07"
   },
   {
     city: "cartagena",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.6051&longitude=-0.9859&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-08&end_date=2025-11-08"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.6051&longitude=-0.9859&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-08&end_date=2025-11-08"
   },
   {
     city: "granada",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.1849&longitude=-3.6028&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.1849&longitude=-3.6028&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
   },
   {
     city: "malaga",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.7195&longitude=-4.4225&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.7195&longitude=-4.4225&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
   },
   {
     city: "seville",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.3879&longitude=-5.9791&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.3879&longitude=-5.9791&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
   },
   {
     city: "cadiz",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.5144&longitude=-6.2744&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.5144&longitude=-6.2744&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
   },
   {
     city: "tangier",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=35.7879&longitude=-5.8097&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-11&end_date=2025-11-11"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=35.7879&longitude=-5.8097&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-11&end_date=2025-11-11"
   },
   {
     city: "lisbon",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.7123&longitude=-9.1277&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-13&end_date=2025-11-13"
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.7123&longitude=-9.1277&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-13&end_date=2025-11-13"
   }
 ];
 
@@ -234,6 +237,7 @@ function fetchWeatherData({ city, apiUrl }) {
       return response.json();
     })
     .then(data => {
+      const tempActual = Math.round(data.current_weather?.temperature ?? "-");
       const max = Math.round(data.daily?.temperature_2m_max?.[0] ?? "-");
       const min = Math.round(data.daily?.temperature_2m_min?.[0] ?? "-");
       const rawRain = data.daily?.precipitation_sum?.[0];
@@ -241,15 +245,15 @@ function fetchWeatherData({ city, apiUrl }) {
       const rainProb = data.daily?.precipitation_probability_max?.[0] ?? "-";
       const gust = Math.round(data.daily?.windgusts_10m_max?.[0] ?? "-");
 
-      document.getElementById(`temp_${city}`).innerHTML = `${min}°F</br>${max}°F`;
+      document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br>${min}-${max}°`;
       document.getElementById(`precip_${city}`).innerHTML = `${rainProb}%</br>(${rain} in)`;
-      document.getElementById(`wind_${city}`).textContent = `${gust} mph`;
+      document.getElementById(`wind_${city}`).innerHTML = `${gust}</br>mph`;
     })
     .catch(error => {
       console.error(`Error loading forecast for ${city}:`, error.message);
-      document.getElementById(`temp_${city}`).textContent = `- °F`;
-      document.getElementById(`precip_${city}`).textContent = `- % (- in)`;
-      document.getElementById(`wind_${city}`).textContent = `- mph`;
+      document.getElementById(`temp_${city}`).innerHTML = `-</br>°F`;
+      document.getElementById(`precip_${city}`).innerHTML = `- %</br>(- in)`;
+      document.getElementById(`wind_${city}`).innerHTML = `-</br>mph`;
     });
 }
 destinations.forEach(fetchWeatherData);
