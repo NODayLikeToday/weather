@@ -19,7 +19,7 @@
       text-align: center;
     }
     .small-text {
-      font-size: 65%;
+      font-size: 80%;
     }
   </style>
 </head>
@@ -245,7 +245,7 @@ function fetchWeatherData({ city, apiUrl }) {
       const rainProb = data.daily?.precipitation_probability_max?.[0] ?? "-";
       const gust = Math.round(data.daily?.windgusts_10m_max?.[0] ?? "-");
 
-      document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br>${min}-${max}°`;
+      document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br><label class="small-text">${min}-${max}°</label>`;
       document.getElementById(`precip_${city}`).innerHTML = `${rainProb}%</br>(${rain} in)`;
       document.getElementById(`wind_${city}`).innerHTML = `${gust}</br>mph`;
     })
