@@ -19,7 +19,10 @@
       text-align: center;
     }
     .small-text {
-      font-size: 80%;
+      font-size: 65%;
+    }
+    .custom-button {
+      width: 45%;
     }
   </style>
 </head>
@@ -30,8 +33,10 @@
 
   <div class="center" style="width: 100%;">
     <p>Current Time in Europe: <span id="rome-timeAMPM"></span></p>
+    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="location.reload()" style="margin-bottom: 12px;">Refresh Page</button>
+    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="refreshWeather()" style="margin-bottom: 12px;">Refresh Weather</button>
   </div>
-  
+
   <table class="table table-bordered">
     <thead>
       <tr style="text-align: center;">
@@ -46,43 +51,43 @@
       <tr class="row-stripe">
         <th rowspan="2" scope="row">11/1</th>
         <td>Rome, Italy</td>
-        <td class="center" id="temp_rome"></td>
-        <td class="center" id="precip_rome"></td>
-        <td class="center" id="wind_rome"></td>
+        <td class="center temperature" id="temp_rome"></td>
+        <td class="center precipitation" id="precip_rome"></td>
+        <td class="center windspeed" id="wind_rome"></td>
       </tr>
       <tr class="row-stripe">
         <td><i>Civitavecchia</i></td>
-        <td class="center" id="temp_civit"></td>
-        <td class="center" id="precip_civit"></td>
-        <td class="center" id="wind_civit"></td>
+        <td class="center temperature" id="temp_civit"></td>
+        <td class="center precipitation" id="precip_civit"></td>
+        <td class="center windspeed" id="wind_civit"></td>
       </tr>
       <tr>
         <th rowspan="2" scope="row">11/2</th>
         <td>Florence, Italy</td>
-        <td class="center" id="temp_florence"></td>
-        <td class="center" id="precip_florence"></td>
-        <td class="center" id="wind_florence"></td>
+        <td class="center temperature" id="temp_florence"></td>
+        <td class="center precipitation" id="precip_florence"></td>
+        <td class="center windspeed" id="wind_florence"></td>
       </tr>
       <tr>
         <td><i>Livorno</i></td>
-        <td class="center" id="temp_livorno"></td>
-        <td class="center" id="precip_livorno"></td>
-        <td class="center" id="wind_livorno"></td>
+        <td class="center temperature" id="temp_livorno"></td>
+        <td class="center precipitation" id="precip_livorno"></td>
+        <td class="center windspeed" id="wind_livorno"></td>
       </tr>
       <tr class="row-stripe">
         <th rowspan="2" scope="row">11/3</td>
         <td>Naples, Italy</td>
-        <td class="center" id="temp_naples"></td>
-        <td class="center" id="precip_naples"></td>
-        <td class="center" id="wind_naples"></td>
+        <td class="center temperature" id="temp_naples"></td>
+        <td class="center precipitation" id="precip_naples"></td>
+        <td class="center windspeed" id="wind_naples"></td>
       </tr>
       <tr>
       <tr>
         <th>11/4</th>
         <td>Siracusa, Italy</td>
-        <td class="center" id="temp_siracusa"></td>
-        <td class="center" id="precip_siracusa"></td>
-        <td class="center" id="wind_siracusa"></td>
+        <td class="center temperature" id="temp_siracusa"></td>
+        <td class="center precipitation" id="precip_siracusa"></td>
+        <td class="center windspeed" id="wind_siracusa"></td>
       </tr>
       <tr class="row-stripe">
         <th>11/5</th>
@@ -94,56 +99,56 @@
       <tr>
         <th>11/6</th>
         <td>Ibiza, Spain</td>
-        <td class="center" id="temp_ibiza"></td>
-        <td class="center" id="precip_ibiza"></td>
-        <td class="center" id="wind_ibiza"></td>
+        <td class="center temperature" id="temp_ibiza"></td>
+        <td class="center precipitation" id="precip_ibiza"></td>
+        <td class="center windspeed" id="wind_ibiza"></td>
       </tr>
       <tr class="row-stripe">
         <th>11/7</th>
         <td>Barcelona, Spain</td>
-        <td class="center" id="temp_barcelona"></td>
-        <td class="center" id="precip_barcelona"></td>
-        <td class="center" id="wind_barcelona"></td>
+        <td class="center temperature" id="temp_barcelona"></td>
+        <td class="center precipitation" id="precip_barcelona"></td>
+        <td class="center windspeed" id="wind_barcelona"></td>
       </tr>
       <tr>
         <th>11/8</th>
         <td>Cartagena, Spain</td>
-        <td class="center" id="temp_cartagena"></td>
-        <td class="center" id="precip_cartagena"></td>
-        <td class="center" id="wind_cartagena"></td>
+        <td class="center temperature" id="temp_cartagena"></td>
+        <td class="center precipitation" id="precip_cartagena"></td>
+        <td class="center windspeed" id="wind_cartagena"></td>
       </tr>
       <tr class="row-stripe">
         <th rowspan="2">11/9</th>
         <td>Granada, Spain</td>
-        <td class="center" id="temp_granada"></td>
-        <td class="center" id="precip_granada"></td>
-        <td class="center" id="wind_granada"></td>
+        <td class="center temperature" id="temp_granada"></td>
+        <td class="center precipitation" id="precip_granada"></td>
+        <td class="center windspeed" id="wind_granada"></td>
       </tr>
       <tr class="row-stripe">
         <td><i>Malaga</i></td>
-        <td class="center" id="temp_malaga"></td>
-        <td class="center" id="precip_malaga"></td>
-        <td class="center" id="wind_malaga"></td>
+        <td class="center temperature" id="temp_malaga"></td>
+        <td class="center precipitation" id="precip_malaga"></td>
+        <td class="center windspeed" id="wind_malaga"></td>
       </tr>
       <tr>
         <th rowspan="2">11/10</th>
         <td>Seville, Spain</td>
-        <td class="center" id="temp_seville"></td>
-        <td class="center" id="precip_seville"></td>
-        <td class="center" id="wind_seville"></td>
+        <td class="center temperature" id="temp_seville"></td>
+        <td class="center precipitation" id="precip_seville"></td>
+        <td class="center windspeed" id="wind_seville"></td>
       </tr>
       <tr>
         <td><i>Cadiz</i></td>
-        <td class="center" id="temp_cadiz"></td>
-        <td class="center" id="precip_cadiz"></td>
-        <td class="center" id="wind_cadiz"></td>
+        <td class="center temperature" id="temp_cadiz"></td>
+        <td class="center precipitation" id="precip_cadiz"></td>
+        <td class="center windspeed" id="wind_cadiz"></td>
       </tr>
       <tr class="row-stripe">
         <th>11/11</th>
         <td>Tangier, Morocco</td>
-        <td class="center" id="temp_tangier"></td>
-        <td class="center" id="precip_tangier"></td>
-        <td class="center" id="wind_tangier"></td>
+        <td class="center temperature" id="temp_tangier"></td>
+        <td class="center precipitation" id="precip_tangier"></td>
+        <td class="center windspeed" id="wind_tangier"></td>
       </tr>
       <tr>
         <th>11/12</th>
@@ -155,9 +160,9 @@
       <tr class="row-stripe">
         <th>11/13</th>
         <td>Lisbon, Portugal</td>
-        <td class="center" id="temp_lisbon"></td>
-        <td class="center" id="precip_lisbon"></td>
-        <td class="center" id="wind_lisbon"></td>
+        <td class="center temperature" id="temp_lisbon"></td>
+        <td class="center precipitation" id="precip_lisbon"></td>
+        <td class="center windspeed" id="wind_lisbon"></td>
       </tr>
     </tbody>
   </table>
@@ -245,7 +250,7 @@ function fetchWeatherData({ city, apiUrl }) {
       const rainProb = data.daily?.precipitation_probability_max?.[0] ?? "-";
       const gust = Math.round(data.daily?.windgusts_10m_max?.[0] ?? "-");
 
-      document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br><label class="small-text">${min}-${max}°</label>`;
+      document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br>${min}-${max}°`;
       document.getElementById(`precip_${city}`).innerHTML = `${rainProb}%</br>(${rain} in)`;
       document.getElementById(`wind_${city}`).innerHTML = `${gust}</br>mph`;
     })
@@ -298,9 +303,28 @@ var todayDate = month + '/' + day;
 
 console.log("Looking for date:", todayDate);
 
-$("th").filter(function() {
+function refreshWeather() {
+  //wipe all data from the table
+  $('.temperature').html("-</br>°F");
+  $('.precipitation').html("- %</br>(- in)");
+  $('.windspeed').html("-</br>mph");
+
+  //pause...
+  setTimeout(() => {
+    console.log('1 second has passed');
+  }, 1000);
+  
+  //grab new data from weather api
+  console.log("Updating weather...");
+  destinations.forEach(fetchWeatherData);
+  console.log("Weather update complete.");
+
+  // updating highlighted line in table for "today"
+  $("th").filter(function() {
     return $(this).text().trim() === todayDate;
-}).closest("tr").css("background-color", "#7EB752");
+  }).closest("tr").css("background-color", "#7EB752");
+  console.log("Highlighting today's line...");
+};
 
 </script>
 
