@@ -32,10 +32,18 @@
   <h1 class="center" style="width: 100%;">Weather Forecast</h1>
 
   <div class="center" style="width: 100%;">
+    <p>Current Time in Alaska: <span id="ak-timeAMPM"></span></p>
+    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="location.reload()" style="margin-bottom: 12px;">Refresh Page</button>
+    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="refreshWeather()" style="margin-bottom: 12px;">Refresh Weather</button>
+  </div>
+
+  <!-- keep for European travel
+  <div class="center" style="width: 100%;">
     <p>Current Time in Europe: <span id="rome-timeAMPM"></span></p>
     <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="location.reload()" style="margin-bottom: 12px;">Refresh Page</button>
     <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="refreshWeather()" style="margin-bottom: 12px;">Refresh Weather</button>
   </div>
+  -->
 
   <table class="table table-bordered">
     <thead>
@@ -48,122 +56,98 @@
       </tr>
     </thead>
     <tbody>
-      <tr class="row-stripe">
-        <th rowspan="2" scope="row">11/1</th>
-        <td>Rome, Italy</td>
-        <td class="center temperature" id="temp_rome"></td>
-        <td class="center precipitation" id="precip_rome"></td>
-        <td class="center windspeed" id="wind_rome"></td>
-      </tr>
-      <tr class="row-stripe">
-        <td><i>Civitavecchia</i></td>
-        <td class="center temperature" id="temp_civit"></td>
-        <td class="center precipitation" id="precip_civit"></td>
-        <td class="center windspeed" id="wind_civit"></td>
-      </tr>
-      <tr>
-        <th rowspan="2" scope="row">11/2</th>
-        <td>Florence, Italy</td>
-        <td class="center temperature" id="temp_florence"></td>
-        <td class="center precipitation" id="precip_florence"></td>
-        <td class="center windspeed" id="wind_florence"></td>
-      </tr>
-      <tr>
-        <td><i>Livorno</i></td>
-        <td class="center temperature" id="temp_livorno"></td>
-        <td class="center precipitation" id="precip_livorno"></td>
-        <td class="center windspeed" id="wind_livorno"></td>
-      </tr>
-      <tr class="row-stripe">
-        <th rowspan="2" scope="row">11/3</td>
-        <td>Naples, Italy</td>
-        <td class="center temperature" id="temp_naples"></td>
-        <td class="center precipitation" id="precip_naples"></td>
-        <td class="center windspeed" id="wind_naples"></td>
-      </tr>
-      <tr>
-      <tr>
-        <th>11/4</th>
-        <td>Siracusa, Italy</td>
-        <td class="center temperature" id="temp_siracusa"></td>
-        <td class="center precipitation" id="precip_siracusa"></td>
-        <td class="center windspeed" id="wind_siracusa"></td>
-      </tr>
-      <tr class="row-stripe">
-        <th>11/5</th>
-        <td>(at sea)</td>
-        <td> - </td>
-        <td> - </td>
-        <td> - </td>
-      </tr>
-      <tr>
-        <th>11/6</th>
-        <td>Ibiza, Spain</td>
-        <td class="center temperature" id="temp_ibiza"></td>
-        <td class="center precipitation" id="precip_ibiza"></td>
-        <td class="center windspeed" id="wind_ibiza"></td>
-      </tr>
-      <tr class="row-stripe">
-        <th>11/7</th>
-        <td>Barcelona, Spain</td>
-        <td class="center temperature" id="temp_barcelona"></td>
-        <td class="center precipitation" id="precip_barcelona"></td>
-        <td class="center windspeed" id="wind_barcelona"></td>
-      </tr>
-      <tr>
-        <th>11/8</th>
-        <td>Cartagena, Spain</td>
-        <td class="center temperature" id="temp_cartagena"></td>
-        <td class="center precipitation" id="precip_cartagena"></td>
-        <td class="center windspeed" id="wind_cartagena"></td>
-      </tr>
-      <tr class="row-stripe">
-        <th rowspan="2">11/9</th>
-        <td>Granada, Spain</td>
-        <td class="center temperature" id="temp_granada"></td>
-        <td class="center precipitation" id="precip_granada"></td>
-        <td class="center windspeed" id="wind_granada"></td>
-      </tr>
-      <tr class="row-stripe">
-        <td><i>Malaga</i></td>
-        <td class="center temperature" id="temp_malaga"></td>
-        <td class="center precipitation" id="precip_malaga"></td>
-        <td class="center windspeed" id="wind_malaga"></td>
-      </tr>
-      <tr>
-        <th rowspan="2">11/10</th>
-        <td>Seville, Spain</td>
-        <td class="center temperature" id="temp_seville"></td>
-        <td class="center precipitation" id="precip_seville"></td>
-        <td class="center windspeed" id="wind_seville"></td>
-      </tr>
-      <tr>
-        <td><i>Cadiz</i></td>
-        <td class="center temperature" id="temp_cadiz"></td>
-        <td class="center precipitation" id="precip_cadiz"></td>
-        <td class="center windspeed" id="wind_cadiz"></td>
-      </tr>
-      <tr class="row-stripe">
-        <th>11/11</th>
-        <td>Tangier, Morocco</td>
-        <td class="center temperature" id="temp_tangier"></td>
-        <td class="center precipitation" id="precip_tangier"></td>
-        <td class="center windspeed" id="wind_tangier"></td>
-      </tr>
-      <tr>
-        <th>11/12</th>
-        <td>(at sea)</td>
-        <td> - </td>
-        <td> - </td>
-        <td> - </td>
-      </tr>
-      <tr class="row-stripe">
-        <th>11/13</th>
-        <td>Lisbon, Portugal</td>
-        <td class="center temperature" id="temp_lisbon"></td>
-        <td class="center precipitation" id="precip_lisbon"></td>
-        <td class="center windspeed" id="wind_lisbon"></td>
-      </tr>
+        <tr>
+          <th scope="row">8/23 (pre)</th>
+          <td>Seattle, Washington</td>
+          <td class="center temperature" id="temp_seattle"></td>
+          <td class="center precipitation" id="precip_seattle"></td>
+          <td class="center windspeed" id="wind_seattle"></td>
+        </tr>
+        <tr class="row-stripe">
+          <th scope="row">8/24</th>
+          <td>Seattle, Washington</td>
+          <td class="center temperature" id="temp_seattle2"></td>
+          <td class="center precipitation" id="precip_seattle2"></td>
+          <td class="center windspeed" id="wind_seattle2"></td>
+        </tr>
+        <tr>
+          <th scope="row">8/25</th>
+          <td>(at sea)</td>
+          <td class="center temperature" id="temp_sea1"></td>
+          <td class="center precipitation" id="precip_sea1"></td>
+          <td class="center windspeed" id="wind_sea1"></td>
+        </tr>
+        <tr class="row-stripe">
+          <th scope="row">8/26</th>
+          <td>Ketchikan (Warden Cove), AK</td>
+          <td class="center temperature" id="temp_ketch"></td>
+          <td class="center precipitation" id="precip_ketch"></td>
+          <td class="center windspeed" id="wind_ketch"></td>
+        </tr>
+        <tr>
+          <th scope="row">8/27</th>
+          <td>Icy Strait Point, AK</td>
+          <td class="center temperature" id="temp_icy"></td>
+          <td class="center precipitation" id="precip_icy"></td>
+          <td class="center windspeed" id="wind_icy"></td>
+        </tr>
+        <tr class="row-stripe">
+          <th scope="row">8/28</th>
+          <td>Juneau, AK</td>
+          <td class="center temperature" id="temp_june"></td>
+          <td class="center precipitation" id="precip_june"></td>
+          <td class="center windspeed" id="wind_june"></td>
+        </tr>
+        <tr>
+          <th scope="row">8/29</th>
+          <td>Skagway, AK</td>
+          <td class="center temperature" id="temp_skag"></td>
+          <td class="center precipitation" id="precip_skag"></td>
+          <td class="center windspeed" id="wind_skag"></td>
+        </tr>
+        <tr class="row-stripe">
+          <th scope="row">8/30</th>
+          <td>Edicott Arm &amp; Dawes Glacier, AK (at sea)</td>
+          <td class="center temperature" id="temp_edi"></td>
+          <td class="center precipitation" id="precip_edi"></td>
+          <td class="center windspeed" id="wind_edi"></td>
+        </tr>
+        <tr>
+          <th scope="row">8/31</th>
+          <td>(at sea)</td>
+          <td class="center temperature" id="temp_sea2"></td>
+          <td class="center precipitation" id="precip_sea2"></td>
+          <td class="center windspeed" id="wind_sea2"></td>
+        </tr>
+        <tr class="row-stripe">
+          <th scope="row">9/1</th>
+          <td>Victoria, BC (Canada)</td>
+          <td class="center temperature" id="temp_vict"></td>
+          <td class="center precipitation" id="precip_vict"></td>
+          <td class="center windspeed" id="wind_vict"></td>
+        </tr>
+        <tr>
+          <th scope="row">9/2</th>
+          <td>Seattle, WA</td>
+          <td class="center temperature" id="temp_seattle3"></td>
+          <td class="center precipitation" id="precip_seattle3"></td>
+          <td class="center windspeed" id="wind_seattle3"></td>
+        </tr>
+        <!-- keep for European travel where two rows are shown to indicate destination and port on same day
+        <tr class="row-stripe">
+          <th rowspan="2" scope="row">11/1</th>
+          <td>Rome, Italy</td>
+          <td class="center temperature" id="temp_rome"></td>
+          <td class="center precipitation" id="precip_rome"></td>
+          <td class="center windspeed" id="wind_rome"></td>
+        </tr>
+        <tr class="row-stripe">
+          <td><i>Civitavecchia</i></td>
+          <td class="center temperature" id="temp_civit"></td>
+          <td class="center precipitation" id="precip_civit"></td>
+          <td class="center windspeed" id="wind_civit"></td>
+        </tr>
+        -->
     </tbody>
   </table>
 </div>
@@ -173,124 +157,147 @@
 
 const destinations = [
   {
-    city: "rome",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.8971&longitude=12.4824&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
+    city: "seattle",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=47.622114&longitude=122.360331&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-23&end_date=2026-08-23"
   },
   {
-    city: "civit",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=42.0941&longitude=11.7930&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-01&end_date=2025-11-01"
+    city: "seattle2",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=47.622114&longitude=122.360331&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-24&end_date=2026-08-24"
   },
   {
-    city: "florence",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.7699&longitude=11.2556&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
+    city: "sea1",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=51.975857&longitude=-128.931407&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-25&end_date=2026-08-25"
   },
   {
-    city: "livorno",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=43.5827&longitude=10.3286&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-02&end_date=2025-11-02"
+    city: "ketch",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=55.366431&longitude=-131.706059&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-26&end_date=2026-08-26"
   },
   {
-    city: "naples",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=40.8391&longitude=14.2456&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-03&end_date=2025-11-03"
+    city: "icy",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=58.129186&longitude=-135.461978&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-27&end_date=2026-08-27"
   },
   {
-    city: "siracusa",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.0745&longitude=15.2856&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-04&end_date=2025-11-04"
+    city: "june",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=58.29670&longitude=-134.40219&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-28&end_date=2026-08-28"
   },
   {
-    city: "ibiza",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.9092&longitude=1.4284&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-06&end_date=2025-11-06"
+    city: "skag",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=59.4605&longitude=-135.2911&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-29&end_date=2026-08-29"
   },
   {
-    city: "barcelona",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=41.3939&longitude=2.1897&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-07&end_date=2025-11-07"
+    city: "edi",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=57.558463&longitude=-133.695840&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-30&end_date=2026-08-30"
   },
   {
-    city: "cartagena",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.6051&longitude=-0.9859&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-08&end_date=2025-11-08"
+    city: "sea2",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=52.074927&longitude=-129.088197&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-31&end_date=2026-08-31"
   },
   {
-    city: "granada",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.1849&longitude=-3.6028&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
+    city: "vict",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=48.423019&longitude=-123.369453&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-09-01&end_date=2026-09-01"
   },
   {
-    city: "malaga",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.7195&longitude=-4.4225&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-09&end_date=2025-11-09"
-  },
-  {
-    city: "seville",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=37.3879&longitude=-5.9791&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
-  },
-  {
-    city: "cadiz",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=36.5144&longitude=-6.2744&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-10&end_date=2025-11-10"
-  },
-  {
-    city: "tangier",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=35.7879&longitude=-5.8097&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-11&end_date=2025-11-11"
-  },
-  {
-    city: "lisbon",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=38.7123&longitude=-9.1277&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=Europe/Rome&start_date=2025-11-13&end_date=2025-11-13"
+    city: "seattle3",
+    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=47.622114&longitude=122.360331&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-09-02&end_date=2026-09-02"
   }
 ];
 
 
-function fetchWeatherData({ city, apiUrl }) {
-  fetch(apiUrl)
-    .then(response => {
-      if (!response.ok) throw new Error(`${city} response was not ok`);
-      return response.json();
-    })
-    .then(data => {
-      const tempActual = Math.round(data.current_weather?.temperature ?? "-");
-      const max = Math.round(data.daily?.temperature_2m_max?.[0] ?? "-");
-      const min = Math.round(data.daily?.temperature_2m_min?.[0] ?? "-");
-      const rawRain = data.daily?.precipitation_sum?.[0];
-      const rain = rawRain !== undefined ? Math.round(rawRain * 10) / 10 : "-";
-      const rainProb = data.daily?.precipitation_probability_max?.[0] ?? "-";
-      const gust = Math.round(data.daily?.windgusts_10m_max?.[0] ?? "-");
+// Pulls the max allowed date out of an Open-Meteo range error, e.g.
+// "Parameter 'start_date' is out of allowed range from 2026-01-01 to 2026-08-20"
+function extractMaxAllowedDate(reason) {
+  const match = reason && reason.match(/to (\d{4}-\d{2}-\d{2})/);
+  return match ? match[1] : null;
+}
 
-      document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br>${min}-${max}°`;
-      document.getElementById(`precip_${city}`).innerHTML = `${rainProb}%</br>(${rain} in)`;
-      document.getElementById(`wind_${city}`).innerHTML = `${gust}</br>mph`;
-    })
-    .catch(error => {
-      console.error(`Error loading forecast for ${city}:`, error.message);
-      document.getElementById(`temp_${city}`).innerHTML = `-</br>°F`;
-      document.getElementById(`precip_${city}`).innerHTML = `- %</br>(- in)`;
-      document.getElementById(`wind_${city}`).innerHTML = `-</br>mph`;
-    });
+// Swap start_date and end_date in a URL for a new date
+function withDate(url, newDate) {
+  return url
+    .replace(/start_date=\d{4}-\d{2}-\d{2}/, `start_date=${newDate}`)
+    .replace(/end_date=\d{4}-\d{2}-\d{2}/, `end_date=${newDate}`);
+}
+
+async function fetchJson(url) {
+  const response = await fetch(url);
+  // Open-Meteo returns a JSON body with { error, reason } even on 400s,
+  // so we parse the body first and decide what to do based on its contents.
+  const data = await response.json();
+  return data;
+}
+
+async function fetchWeatherData(dest) {
+  const { city } = dest;
+  try {
+    let data = await fetchJson(dest.apiUrl);
+
+    if (data.error) {
+      if (data.reason && /out of allowed range/i.test(data.reason)) {
+        const maxDate = extractMaxAllowedDate(data.reason);
+        if (maxDate) {
+          console.warn(`${city}: ${data.reason} — retrying with ${maxDate}`);
+          // Persist the corrected URL on the destination object so future
+          // refreshes (and this run) use the corrected date going forward.
+          dest.apiUrl = withDate(dest.apiUrl, maxDate);
+          data = await fetchJson(dest.apiUrl);
+        }
+      }
+      if (data.error) {
+        throw new Error(data.reason || `${city} response was not ok`);
+      }
+    }
+
+    const tempActual = Math.round(data.current_weather?.temperature ?? "-");
+    const max = Math.round(data.daily?.temperature_2m_max?.[0] ?? "-");
+    const min = Math.round(data.daily?.temperature_2m_min?.[0] ?? "-");
+    const rawRain = data.daily?.precipitation_sum?.[0];
+    const rain = rawRain !== undefined ? Math.round(rawRain * 10) / 10 : "-";
+    const rainProb = data.daily?.precipitation_probability_max?.[0] ?? "-";
+    const gust = Math.round(data.daily?.windgusts_10m_max?.[0] ?? "-");
+
+    document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br>${min}-${max}°`;
+    document.getElementById(`precip_${city}`).innerHTML = `${rainProb}%</br>(${rain} in)`;
+    document.getElementById(`wind_${city}`).innerHTML = `${gust}</br>mph`;
+  } catch (error) {
+    console.error(`Error loading forecast for ${city}:`, error.message);
+    document.getElementById(`temp_${city}`).innerHTML = `-</br>°F`;
+    document.getElementById(`precip_${city}`).innerHTML = `- %</br>(- in)`;
+    document.getElementById(`wind_${city}`).innerHTML = `-</br>mph`;
+  }
 }
 destinations.forEach(fetchWeatherData);
 
 
 // Display the current time in Europe (Rome time zone)
-function updateRomeTime() {
+function updateAKTime() {
   const now = new Date();
 
   const options24 = {
-    timeZone: 'Europe/Rome',
+    timeZone: 'America/Juneau',
+    // timeZone: 'Europe/Rome',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
   };
 
   const optionsAMPM = {
-    timeZone: 'Europe/Rome',
+    timeZone: 'America/Juneau',
+    // timeZone: 'Europe/Rome',
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
   };
 
-  const formatter24 = new Intl.DateTimeFormat('en-GB', options24);
-  const formatterAMPM = new Intl.DateTimeFormat('en-GB', optionsAMPM);
+  const formatter24 = new Intl.DateTimeFormat('en-US', options24)
+  const formatterAMPM = new Intl.DateTimeFormat('en-US', optionsAMPM);
+  //const formatter24 = new Intl.DateTimeFormat('en-GB', options24);
+  //const formatterAMPM = new Intl.DateTimeFormat('en-GB', optionsAMPM);
 
   // Display both formats
   //document.getElementById('rome-time').textContent = formatterAMPM.format(now);
-  document.getElementById('rome-timeAMPM').textContent = `${formatterAMPM.format(now)} (${formatter24.format(now)})`;
+  document.getElementById('ak-timeAMPM').textContent = `${formatterAMPM.format(now)} (${formatter24.format(now)})`;
 }
 // Update every second
-setInterval(updateRomeTime, 1000);
+setInterval(updateAKTime, 1000);
 
 
 
@@ -313,7 +320,7 @@ function refreshWeather() {
   setTimeout(() => {
     console.log('1 second has passed');
   }, 1000);
-  
+
   //grab new data from weather api
   console.log("Updating weather...");
   destinations.forEach(fetchWeatherData);
@@ -330,4 +337,3 @@ function refreshWeather() {
 
 </body>
 </html>
-        
