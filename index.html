@@ -253,7 +253,7 @@
         <!-- rows are generated from CONFIG.destinations below -->
       </tbody>
     </table>
-    <footer class="note">Pull-to-refresh not required &mdash; use Refresh Weather above.</footer>
+    <footer class="note"></footer>
   </div>
 </main>
 
@@ -330,8 +330,9 @@ const CONFIG = {
 function buildApiUrl(dest) {
   return "https://api.open-meteo.com/v1/forecast"
     + `?latitude=${dest.lat}&longitude=${dest.lon}`
-    + "&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max"
-    + "&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph"
+    + "&daily=apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,wind_speed_10m_max"
+    + "&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m"
+    + "&models=best_match&temperature_unit=fahrenheit&precipitation_unit=inch&wind_speed_unit=mph"
     + `&timezone=${encodeURIComponent(CONFIG.timezone)}`
     + `&start_date=${dest.start}&end_date=${dest.end}`;
 }
@@ -448,7 +449,7 @@ async function fetchWeatherData(dest) {
   const { id } = dest;
   try {
     let data = await fetchJson(buildApiUrl(dest));
-
+    /*
     if (data.error) {
       if (data.reason && /out of allowed range/i.test(data.reason)) {
         const maxDate = extractMaxAllowedDate(data.reason);
@@ -465,30 +466,58 @@ async function fetchWeatherData(dest) {
         throw new Error(data.reason || `${id} response was not ok`);
       }
     }
+    */
+    if (data.error) {
+    if (data.reason && /out of allowed range/i.test(data.reason)) {
+      const maxDateStr = extractMaxAllowedDate(data.reason);
+      if (maxDateStr) {
+        // Convert the string to a Date object
+        const maxDate = new Date(maxDateStr);
 
+        // Subtract one day safely handling month and year boundaries
+        maxDate.setDate(maxDate.getDate() - 1);
+
+        // Convert it back to a string format if your API requires it (e.g., YYYY-MM-DD)
+        const adjustedDate = maxDate.toISOString().split('T')[0];
+
+        console.warn(`${id}: ${data.reason} — retrying with ${adjustedDate}`);
+        // Persist the corrected date on the entry so future refreshes
+        // (and this run) use it going forward.
+        dest.start = adjustedDate;
+        dest.end = adjustedDate;
+        data = await fetchJson(buildApiUrl(dest));
+      }
+    }
+    if (data.error) {
+      throw new Error(data.reason || `${id} response was not ok`);
+    }
+  }
+  
     // Rounds a value if it's an actual number; otherwise returns a dash.
     // (Math.round(x ?? "-") is a trap — Math.round("-") is NaN, not "-".)
     const round = (value, decimals = 0) => {
-      if (typeof value !== "number" || Number.isNaN(value)) return "&ndash;";
+      //if (typeof value !== "number" || Number.isNaN(value)) return "&ndash;";
+      if (typeof value !== "number" || Number.isNaN(value)) return "?";
       const factor = 10 ** decimals;
       return Math.round(value * factor) / factor;
     };
 
-    const tempActual = round(data.current_weather?.temperature);
-    const max = round(data.daily?.temperature_2m_max?.[0]);
-    const min = round(data.daily?.temperature_2m_min?.[0]);
+    const tempActual = round(data.current?.temperature_2m);
+    const max = round(data.daily?.apparent_temperature_max?.[0]);
+    const min = round(data.daily?.apparent_temperature_min?.[0]);
     const rain = round(data.daily?.precipitation_sum?.[0], 1);
     const rainProb = round(data.daily?.precipitation_probability_max?.[0]);
     const gust = round(data.daily?.wind_gusts_10m_max?.[0]);
+    const windSpeed = round(data.daily?.wind_speed_10m_max?.[0]);
 
-    document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>${tempActual}&deg;F</strong><span class="sub">${min}&ndash;${max}&deg;</span></span>`;
+    document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>${tempActual}&deg;F</strong><span class="sub"> Low: ${min} &ndash; High: ${max}&deg;</span></span>`;
     document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>${rainProb}%</strong><span class="sub">${rain} in</span></span>`;
-    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>${gust}</strong><span class="sub">mph</span></span>`;
+    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>${gust} mph</strong><span class="sub">${windSpeed} mph sustained</span></span>`;
   } catch (error) {
     console.error(`Error loading forecast for ${id}:`, error.message);
-    document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>&ndash;</strong><span class="sub">&deg;F</span></span>`;
-    document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>&ndash;</strong><span class="sub">in</span></span>`;
-    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>&ndash;</strong><span class="sub">mph</span></span>`;
+    document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>? &deg;F</strong><span class="sub"> Low: ? &ndash; High: ?&deg;</span></span>`;
+    document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>${rainProb}%</strong><span class="sub">? in</span></span>`;
+    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>${gust} mph</strong><span class="sub">? mph sustained</span></span>`;
   }
 }
 
