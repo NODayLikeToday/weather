@@ -4,204 +4,431 @@
   <title>Weather Forecast</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    .row-stripe {
-      background-color: rgba(0, 0, 0, 0.05);
+    :root {
+      --ink: #122A33;
+      --sea: #1F6F78;
+      --sea-deep: #0E4048;
+      --mist: #F4F8F7;
+      --card: #FFFFFF;
+      --sand: #E3A542;
+      --line: #DCE8E6;
+      --muted: #5B7B80;
     }
-    td {
-      min-width: 75px;
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--mist);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
-    .center {
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 0 48px;
+    }
+
+    header.hero {
+      background: linear-gradient(160deg, var(--sea) 0%, var(--sea-deep) 100%);
+      color: #EAF4F3;
+      padding: 32px 20px 40px;
       text-align: center;
     }
-    .small-text {
-      font-size: 65%;
+
+    .eyebrow {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      color: var(--sand);
+      margin: 0 0 4px;
     }
-    .custom-button {
-      width: 45%;
+
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      margin: 0 0 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .clock-card {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      padding: 10px 22px;
+      margin-bottom: 22px;
+    }
+
+    .clock-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #BFDEDB;
+    }
+
+    .clock-value {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .btn {
+      flex: 1;
+      appearance: none;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid rgba(255, 255, 255, 0.55);
+      color: #EAF4F3;
+    }
+    .btn-outline:hover { background: rgba(255, 255, 255, 0.1); }
+
+    .btn-solid {
+      background: var(--sand);
+      border: 1.5px solid var(--sand);
+      color: #2A1B02;
+    }
+    .btn-solid:hover { background: #EFB35E; }
+
+    .wave {
+      display: block;
+      width: 100%;
+      height: 22px;
+      margin-top: -1px;
+    }
+
+    main { padding: 28px 16px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(18, 42, 51, 0.06), 0 8px 24px rgba(18, 42, 51, 0.06);
+    }
+
+    thead th {
+      background: var(--sea-deep);
+      color: #DCEFED;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    tbody tr { border-top: 1px solid var(--line); }
+    tbody tr:nth-child(even) { background: rgba(31, 111, 120, 0.035); }
+
+    tbody th, tbody td {
+      padding: 12px 10px;
+      text-align: center;
+      font-size: 0.92rem;
+      vertical-align: middle;
+    }
+
+    tbody th {
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      color: var(--sea-deep);
+      white-space: nowrap;
+    }
+
+    tbody td:nth-child(2) { text-align: left; }
+
+    .metric strong { display: block; font-size: 1rem; }
+    .metric .sub { display: block; font-size: 0.74rem; color: var(--muted); margin-top: 1px; }
+
+    tr.today-row { position: relative; }
+    tr.today-row th, tr.today-row td { background: rgba(227, 165, 66, 0.12); }
+    tr.today-row th { box-shadow: inset 4px 0 0 var(--sand); }
+
+    footer.note {
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+      padding: 18px 16px 0;
+    }
+
+    /* Below this width, the table becomes a stack of cards so nothing
+       has to squeeze horizontally or scroll sideways. */
+    @media (max-width: 680px) {
+      table, thead, tbody, tr, th, td { display: block; }
+      thead { display: none; }
+
+      tbody tr {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin-bottom: 12px;
+        padding: 12px 14px;
+        box-shadow: 0 1px 2px rgba(18, 42, 51, 0.05);
+      }
+      tbody tr:nth-child(even) { background: var(--card); }
+
+      tbody th {
+        text-align: left;
+        font-size: 1rem;
+        padding: 0 0 4px;
+      }
+      tr.today-row th { box-shadow: none; border-left: 4px solid var(--sand); padding-left: 10px; margin-left: -14px; padding-top: 2px; }
+
+      tbody td { text-align: left; padding: 6px 0; display: flex; justify-content: space-between; align-items: baseline; }
+      tbody td:nth-child(2) { font-weight: 600; padding-top: 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+
+      td.metric::before {
+        content: attr(data-label);
+        font-size: 0.76rem;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .metric strong, .metric .sub { display: inline; }
+      .metric .sub { margin-left: 6px; }
     }
   </style>
 </head>
 <body>
 
-<div class="container-fluid">
-  <h1 class="center" style="width: 100%;">Weather Forecast</h1>
-
-  <div class="center" style="width: 100%;">
-    <p>Current Time in Alaska: <span id="ak-timeAMPM"></span></p>
-    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="location.reload()" style="margin-bottom: 12px;">Refresh Page</button>
-    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="refreshWeather()" style="margin-bottom: 12px;">Refresh Weather</button>
+<header class="hero">
+  <p class="eyebrow" id="trip-label"></p>
+  <h1>Weather Forecast</h1>
+  <div class="clock-card">
+    <span class="clock-label">Current time &middot; <span id="tz-label"></span></span>
+    <span class="clock-value" id="local-timeAMPM"></span>
   </div>
-
-  <!-- keep for European travel
-  <div class="center" style="width: 100%;">
-    <p>Current Time in Europe: <span id="rome-timeAMPM"></span></p>
-    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="location.reload()" style="margin-bottom: 12px;">Refresh Page</button>
-    <button type="button" class="btn btn-outline-primary custom-button" id="refreshWeatherButton" onclick="refreshWeather()" style="margin-bottom: 12px;">Refresh Weather</button>
+  <div class="actions">
+    <button type="button" class="btn btn-outline" onclick="location.reload()">Refresh Page</button>
+    <button type="button" class="btn btn-solid" onclick="refreshWeather()">Refresh Weather</button>
   </div>
-  -->
+</header>
+<svg class="wave" viewBox="0 0 400 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 8 Q 25 18 50 8 T 100 8 T 150 8 T 200 8 T 250 8 T 300 8 T 350 8 T 400 8 V0 H0 Z" fill="#F4F8F7"></path>
+</svg>
 
-  <table class="table table-bordered">
-    <thead>
-      <tr style="text-align: center;">
-        <th scope="col">Date</th>
-        <th scope="col">Location</th>
-        <th scope="col">Temp</th>
-        <th scope="col">Precip</th>
-        <th scope="col">Wind Gusts</th>
-      </tr>
-    </thead>
-    <tbody>
+<main>
+  <div class="wrap" style="padding:0;">
+    <table>
+      <thead>
         <tr>
-          <th scope="row">8/23 (pre)</th>
-          <td>Seattle, Washington</td>
-          <td class="center temperature" id="temp_seattle"></td>
-          <td class="center precipitation" id="precip_seattle"></td>
-          <td class="center windspeed" id="wind_seattle"></td>
+          <th scope="col">Date</th>
+          <th scope="col">Location</th>
+          <th scope="col">Temp</th>
+          <th scope="col">Precip</th>
+          <th scope="col">Wind Gusts</th>
         </tr>
-        <tr class="row-stripe">
-          <th scope="row">8/24</th>
-          <td>Seattle, Washington</td>
-          <td class="center temperature" id="temp_seattle2"></td>
-          <td class="center precipitation" id="precip_seattle2"></td>
-          <td class="center windspeed" id="wind_seattle2"></td>
-        </tr>
-        <tr>
-          <th scope="row">8/25</th>
-          <td>(at sea)</td>
-          <td class="center temperature" id="temp_sea1"></td>
-          <td class="center precipitation" id="precip_sea1"></td>
-          <td class="center windspeed" id="wind_sea1"></td>
-        </tr>
-        <tr class="row-stripe">
-          <th scope="row">8/26</th>
-          <td>Ketchikan (Warden Cove), AK</td>
-          <td class="center temperature" id="temp_ketch"></td>
-          <td class="center precipitation" id="precip_ketch"></td>
-          <td class="center windspeed" id="wind_ketch"></td>
-        </tr>
-        <tr>
-          <th scope="row">8/27</th>
-          <td>Icy Strait Point, AK</td>
-          <td class="center temperature" id="temp_icy"></td>
-          <td class="center precipitation" id="precip_icy"></td>
-          <td class="center windspeed" id="wind_icy"></td>
-        </tr>
-        <tr class="row-stripe">
-          <th scope="row">8/28</th>
-          <td>Juneau, AK</td>
-          <td class="center temperature" id="temp_june"></td>
-          <td class="center precipitation" id="precip_june"></td>
-          <td class="center windspeed" id="wind_june"></td>
-        </tr>
-        <tr>
-          <th scope="row">8/29</th>
-          <td>Skagway, AK</td>
-          <td class="center temperature" id="temp_skag"></td>
-          <td class="center precipitation" id="precip_skag"></td>
-          <td class="center windspeed" id="wind_skag"></td>
-        </tr>
-        <tr class="row-stripe">
-          <th scope="row">8/30</th>
-          <td>Edicott Arm &amp; Dawes Glacier, AK (at sea)</td>
-          <td class="center temperature" id="temp_edi"></td>
-          <td class="center precipitation" id="precip_edi"></td>
-          <td class="center windspeed" id="wind_edi"></td>
-        </tr>
-        <tr>
-          <th scope="row">8/31</th>
-          <td>(at sea)</td>
-          <td class="center temperature" id="temp_sea2"></td>
-          <td class="center precipitation" id="precip_sea2"></td>
-          <td class="center windspeed" id="wind_sea2"></td>
-        </tr>
-        <tr class="row-stripe">
-          <th scope="row">9/1</th>
-          <td>Victoria, BC (Canada)</td>
-          <td class="center temperature" id="temp_vict"></td>
-          <td class="center precipitation" id="precip_vict"></td>
-          <td class="center windspeed" id="wind_vict"></td>
-        </tr>
-        <tr>
-          <th scope="row">9/2</th>
-          <td>Seattle, WA</td>
-          <td class="center temperature" id="temp_seattle3"></td>
-          <td class="center precipitation" id="precip_seattle3"></td>
-          <td class="center windspeed" id="wind_seattle3"></td>
-        </tr>
-        <!-- keep for European travel where two rows are shown to indicate destination and port on same day
-        <tr class="row-stripe">
-          <th rowspan="2" scope="row">11/1</th>
-          <td>Rome, Italy</td>
-          <td class="center temperature" id="temp_rome"></td>
-          <td class="center precipitation" id="precip_rome"></td>
-          <td class="center windspeed" id="wind_rome"></td>
-        </tr>
-        <tr class="row-stripe">
-          <td><i>Civitavecchia</i></td>
-          <td class="center temperature" id="temp_civit"></td>
-          <td class="center precipitation" id="precip_civit"></td>
-          <td class="center windspeed" id="wind_civit"></td>
-        </tr>
-        -->
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody id="forecast-body">
+        <!-- rows are generated from CONFIG.destinations below -->
+      </tbody>
+    </table>
+    <footer class="note">Pull-to-refresh not required &mdash; use Refresh Weather above.</footer>
+  </div>
+</main>
 
 <script>
-// List out all of the destinations and their corresponding API calls including date
+/* =============================================================
+   TRIP CONFIG — this is the only block you should need to touch
+   when planning a new trip.
 
-const destinations = [
-  {
-    city: "seattle",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=47.622114&longitude=122.360331&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-23&end_date=2026-08-23"
-  },
-  {
-    city: "seattle2",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=47.622114&longitude=122.360331&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-24&end_date=2026-08-24"
-  },
-  {
-    city: "sea1",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=51.975857&longitude=-128.931407&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-25&end_date=2026-08-25"
-  },
-  {
-    city: "ketch",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=55.366431&longitude=-131.706059&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-26&end_date=2026-08-26"
-  },
-  {
-    city: "icy",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=58.129186&longitude=-135.461978&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-27&end_date=2026-08-27"
-  },
-  {
-    city: "june",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=58.29670&longitude=-134.40219&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-28&end_date=2026-08-28"
-  },
-  {
-    city: "skag",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=59.4605&longitude=-135.2911&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-29&end_date=2026-08-29"
-  },
-  {
-    city: "edi",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=57.558463&longitude=-133.695840&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-30&end_date=2026-08-30"
-  },
-  {
-    city: "sea2",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=52.074927&longitude=-129.088197&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-08-31&end_date=2026-08-31"
-  },
-  {
-    city: "vict",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=48.423019&longitude=-123.369453&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-09-01&end_date=2026-09-01"
-  },
-  {
-    city: "seattle3",
-    apiUrl: "https://api.open-meteo.com/v1/forecast?latitude=47.622114&longitude=122.360331&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,windgusts_10m_max&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph&timezone=America/Juneau&start_date=2026-09-02&end_date=2026-09-02"
-  }
-];
+   tripLabel:      Optional short label shown above the headline
+                    (e.g. "Alaska & Inside Passage").
+   hidePastDates:  If true (default), rows whose date has already
+                    passed — in the trip timezone — are skipped
+                    entirely and never fetched. Set to false to
+                    always show the full itinerary.
+   timezone:       IANA tz name (e.g. "America/Juneau",
+                    "Europe/Rome"). Drives both the "current
+                    time" clock and the Open-Meteo `timezone`
+                    param for every row.
+   timezoneLabel:   Plain-English label shown next to the clock
+                    (e.g. "Alaska", "Europe").
 
+   destinations:    One entry per table row, in display order.
+     date         - M/D form, used to detect "today" (must match
+                    real-world month/day even if dateLabel has a
+                    suffix like "(pre)").
+     dateLabel    - What's actually printed in the Date column.
+                    Defaults to `date` if omitted.
+     location     - Text shown in the Location column.
+     lat / lon    - Coordinates for the forecast.
+     start / end  - Forecast date(s), "YYYY-MM-DD".
+     extraRow     - Optional. Use this for a second stop on the
+                    same date (e.g. a port day with two legs,
+                    like the old Rome/Civitavecchia case). Same
+                    shape as a destination entry minus `date`.
+   ============================================================= */
+const CONFIG = {
+  tripLabel: "Alaska & Inside Passage",
+  hidePastDates: true,
+  timezone: "America/Juneau",
+  timezoneLabel: "Alaska",
+  destinations: [
+    { date: "8/23", dateLabel: "8/23 (pre)", location: "Seattle, Washington",
+      lat: 47.622114, lon: -122.360331, start: "2026-08-23", end: "2026-08-23" },
+    { date: "8/24", location: "Seattle, Washington",
+      lat: 47.622114, lon: -122.360331, start: "2026-08-24", end: "2026-08-24" },
+    { date: "8/25", location: "(at sea)",
+      lat: 51.975857, lon: -128.931407, start: "2026-08-25", end: "2026-08-25" },
+    { date: "8/26", location: "Ketchikan (Warden Cove), AK",
+      lat: 55.366431, lon: -131.706059, start: "2026-08-26", end: "2026-08-26" },
+    { date: "8/27", location: "Icy Strait Point, AK",
+      lat: 58.129186, lon: -135.461978, start: "2026-08-27", end: "2026-08-27" },
+    { date: "8/28", location: "Juneau, AK",
+      lat: 58.29670, lon: -134.40219, start: "2026-08-28", end: "2026-08-28" },
+    { date: "8/29", location: "Skagway, AK",
+      lat: 59.4605, lon: -135.2911, start: "2026-08-29", end: "2026-08-29" },
+    { date: "8/30", location: "Endicott Arm & Dawes Glacier, AK (at sea)",
+      lat: 57.558463, lon: -133.695840, start: "2026-08-30", end: "2026-08-30" },
+    { date: "8/31", location: "(at sea)",
+      lat: 52.074927, lon: -129.088197, start: "2026-08-31", end: "2026-08-31" },
+    { date: "9/1", location: "Victoria, BC (Canada)",
+      lat: 48.423019, lon: -123.369453, start: "2026-09-01", end: "2026-09-01" },
+    { date: "9/2", location: "Seattle, WA",
+      lat: 47.622114, lon: -122.360331, start: "2026-09-02", end: "2026-09-02" },
+
+    // Example of a two-row-same-date entry (kept for reference —
+    // delete or adapt when needed):
+    // { date: "11/1", location: "Rome, Italy",
+    //   lat: 41.9028, lon: 12.4964, start: "2026-11-01", end: "2026-11-01",
+    //   extraRow: { location: "Civitavecchia", lat: 42.0942, lon: 11.7955 } },
+  ]
+};
+/* ============================================================= */
+
+function buildApiUrl(dest) {
+  return "https://api.open-meteo.com/v1/forecast"
+    + `?latitude=${dest.lat}&longitude=${dest.lon}`
+    + "&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max"
+    + "&current_weather=true&temperature_unit=fahrenheit&precipitation_unit=inch&windspeed_unit=mph"
+    + `&timezone=${encodeURIComponent(CONFIG.timezone)}`
+    + `&start_date=${dest.start}&end_date=${dest.end}`;
+}
+
+// Today's date, as YYYY-MM-DD, in the trip's timezone (not the
+// viewer's local timezone) — so "today" matches the ship's clock.
+function getTodayISO() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: CONFIG.timezone,
+    year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date());
+}
+
+// CONFIG.destinations filtered down to today-or-later, when
+// hidePastDates is on. `start` (YYYY-MM-DD) is compared directly
+// since it's already zero-padded and sorts correctly as a string.
+function visibleDestinations() {
+  if (CONFIG.hidePastDates === false) return CONFIG.destinations;
+  const todayISO = getTodayISO();
+  return CONFIG.destinations.filter(dest => dest.start >= todayISO);
+}
+
+function makeMetricCell(label, className, id) {
+  const td = document.createElement("td");
+  td.className = `metric ${className}`;
+  td.id = `${className}_${id}`;
+  td.dataset.label = label;
+  return td;
+}
+
+// Flatten destinations + any extraRow entries into one list of
+// fetchable objects, each tagged with a unique `id`.
+function allEntries() {
+  const list = [];
+  visibleDestinations().forEach((dest) => {
+    list.push(dest);
+    if (dest.extraRow) {
+      dest.extraRow.id = `${dest.id}b`;
+      dest.extraRow.start = dest.extraRow.start || dest.start;
+      dest.extraRow.end = dest.extraRow.end || dest.end;
+      list.push(dest.extraRow);
+    }
+  });
+  return list;
+}
+
+// Ids are assigned once, over the *full* (unfiltered) list, so a
+// destination keeps the same id whether or not it's currently visible.
+function assignIds() {
+  CONFIG.destinations.forEach((dest, i) => { dest.id = `loc${i}`; });
+}
+
+function buildRows() {
+  const tbody = document.getElementById("forecast-body");
+  tbody.innerHTML = "";
+
+  visibleDestinations().forEach((dest) => {
+    const tr = document.createElement("tr");
+    tr.dataset.date = dest.date;
+
+    const th = document.createElement("th");
+    th.scope = "row";
+    th.textContent = dest.dateLabel || dest.date;
+    if (dest.extraRow) th.rowSpan = 2;
+    tr.appendChild(th);
+
+    const locTd = document.createElement("td");
+    locTd.textContent = dest.location;
+    tr.appendChild(locTd);
+
+    tr.appendChild(makeMetricCell("Temp", "temperature", dest.id));
+    tr.appendChild(makeMetricCell("Precip", "precipitation", dest.id));
+    tr.appendChild(makeMetricCell("Wind gusts", "windspeed", dest.id));
+    tbody.appendChild(tr);
+
+    if (dest.extraRow) {
+      const extra = dest.extraRow;
+      extra.id = `${dest.id}b`;
+      extra.start = extra.start || dest.start;
+      extra.end = extra.end || dest.end;
+
+      const tr2 = document.createElement("tr");
+      tr2.dataset.date = dest.date;
+
+      const extraLocTd = document.createElement("td");
+      const em = document.createElement("i");
+      em.textContent = extra.location;
+      extraLocTd.appendChild(em);
+      tr2.appendChild(extraLocTd);
+
+      tr2.appendChild(makeMetricCell("Temp", "temperature", extra.id));
+      tr2.appendChild(makeMetricCell("Precip", "precipitation", extra.id));
+      tr2.appendChild(makeMetricCell("Wind gusts", "windspeed", extra.id));
+      tbody.appendChild(tr2);
+    }
+  });
+}
 
 // Pulls the max allowed date out of an Open-Meteo range error, e.g.
 // "Parameter 'start_date' is out of allowed range from 2026-01-01 to 2026-08-20"
@@ -210,129 +437,100 @@ function extractMaxAllowedDate(reason) {
   return match ? match[1] : null;
 }
 
-// Swap start_date and end_date in a URL for a new date
-function withDate(url, newDate) {
-  return url
-    .replace(/start_date=\d{4}-\d{2}-\d{2}/, `start_date=${newDate}`)
-    .replace(/end_date=\d{4}-\d{2}-\d{2}/, `end_date=${newDate}`);
-}
-
 async function fetchJson(url) {
   const response = await fetch(url);
   // Open-Meteo returns a JSON body with { error, reason } even on 400s,
   // so we parse the body first and decide what to do based on its contents.
-  const data = await response.json();
-  return data;
+  return response.json();
 }
 
 async function fetchWeatherData(dest) {
-  const { city } = dest;
+  const { id } = dest;
   try {
-    let data = await fetchJson(dest.apiUrl);
+    let data = await fetchJson(buildApiUrl(dest));
 
     if (data.error) {
       if (data.reason && /out of allowed range/i.test(data.reason)) {
         const maxDate = extractMaxAllowedDate(data.reason);
         if (maxDate) {
-          console.warn(`${city}: ${data.reason} — retrying with ${maxDate}`);
-          // Persist the corrected URL on the destination object so future
-          // refreshes (and this run) use the corrected date going forward.
-          dest.apiUrl = withDate(dest.apiUrl, maxDate);
-          data = await fetchJson(dest.apiUrl);
+          console.warn(`${id}: ${data.reason} — retrying with ${maxDate}`);
+          // Persist the corrected date on the entry so future refreshes
+          // (and this run) use it going forward.
+          dest.start = maxDate;
+          dest.end = maxDate;
+          data = await fetchJson(buildApiUrl(dest));
         }
       }
       if (data.error) {
-        throw new Error(data.reason || `${city} response was not ok`);
+        throw new Error(data.reason || `${id} response was not ok`);
       }
     }
 
-    const tempActual = Math.round(data.current_weather?.temperature ?? "-");
-    const max = Math.round(data.daily?.temperature_2m_max?.[0] ?? "-");
-    const min = Math.round(data.daily?.temperature_2m_min?.[0] ?? "-");
-    const rawRain = data.daily?.precipitation_sum?.[0];
-    const rain = rawRain !== undefined ? Math.round(rawRain * 10) / 10 : "-";
-    const rainProb = data.daily?.precipitation_probability_max?.[0] ?? "-";
-    const gust = Math.round(data.daily?.windgusts_10m_max?.[0] ?? "-");
+    // Rounds a value if it's an actual number; otherwise returns a dash.
+    // (Math.round(x ?? "-") is a trap — Math.round("-") is NaN, not "-".)
+    const round = (value, decimals = 0) => {
+      if (typeof value !== "number" || Number.isNaN(value)) return "&ndash;";
+      const factor = 10 ** decimals;
+      return Math.round(value * factor) / factor;
+    };
 
-    document.getElementById(`temp_${city}`).innerHTML = `<strong>${tempActual} °F</strong></br>${min}-${max}°`;
-    document.getElementById(`precip_${city}`).innerHTML = `${rainProb}%</br>(${rain} in)`;
-    document.getElementById(`wind_${city}`).innerHTML = `${gust}</br>mph`;
+    const tempActual = round(data.current_weather?.temperature);
+    const max = round(data.daily?.temperature_2m_max?.[0]);
+    const min = round(data.daily?.temperature_2m_min?.[0]);
+    const rain = round(data.daily?.precipitation_sum?.[0], 1);
+    const rainProb = round(data.daily?.precipitation_probability_max?.[0]);
+    const gust = round(data.daily?.wind_gusts_10m_max?.[0]);
+
+    document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>${tempActual}&deg;F</strong><span class="sub">${min}&ndash;${max}&deg;</span></span>`;
+    document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>${rainProb}%</strong><span class="sub">${rain} in</span></span>`;
+    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>${gust}</strong><span class="sub">mph</span></span>`;
   } catch (error) {
-    console.error(`Error loading forecast for ${city}:`, error.message);
-    document.getElementById(`temp_${city}`).innerHTML = `-</br>°F`;
-    document.getElementById(`precip_${city}`).innerHTML = `- %</br>(- in)`;
-    document.getElementById(`wind_${city}`).innerHTML = `-</br>mph`;
+    console.error(`Error loading forecast for ${id}:`, error.message);
+    document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>&ndash;</strong><span class="sub">&deg;F</span></span>`;
+    document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>&ndash;</strong><span class="sub">in</span></span>`;
+    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>&ndash;</strong><span class="sub">mph</span></span>`;
   }
 }
-destinations.forEach(fetchWeatherData);
 
-
-// Display the current time in Europe (Rome time zone)
-function updateAKTime() {
-  const now = new Date();
-
-  const options24 = {
-    timeZone: 'America/Juneau',
-    // timeZone: 'Europe/Rome',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  };
-
-  const optionsAMPM = {
-    timeZone: 'America/Juneau',
-    // timeZone: 'Europe/Rome',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-  };
-
-  const formatter24 = new Intl.DateTimeFormat('en-US', options24)
-  const formatterAMPM = new Intl.DateTimeFormat('en-US', optionsAMPM);
-  //const formatter24 = new Intl.DateTimeFormat('en-GB', options24);
-  //const formatterAMPM = new Intl.DateTimeFormat('en-GB', optionsAMPM);
-
-  // Display both formats
-  //document.getElementById('rome-time').textContent = formatterAMPM.format(now);
-  document.getElementById('ak-timeAMPM').textContent = `${formatterAMPM.format(now)} (${formatter24.format(now)})`;
+function fetchAll() {
+  allEntries().forEach(fetchWeatherData);
 }
-// Update every second
-setInterval(updateAKTime, 1000);
 
+// Display the current time in CONFIG.timezone
+function updateLocalTime() {
+  const now = new Date();
+  const optionsAMPM = { timeZone: CONFIG.timezone, hour: "2-digit", minute: "2-digit", hour12: true };
+  const options24 = { timeZone: CONFIG.timezone, hour: "2-digit", minute: "2-digit", hour12: false };
+  const formatterAMPM = new Intl.DateTimeFormat("en-US", optionsAMPM);
+  const formatter24 = new Intl.DateTimeFormat("en-US", options24);
+  document.getElementById("local-timeAMPM").textContent = `${formatterAMPM.format(now)} (${formatter24.format(now)})`;
+}
 
-
-// Select the current day's line in the table
-var today = new Date();
-
-var month = today.getMonth() + 1;
-var day = today.getDate();
-var todayDate = month + '/' + day;
-
-console.log("Looking for date:", todayDate);
+function highlightToday() {
+  const today = new Date();
+  const todayDate = `${today.getMonth() + 1}/${today.getDate()}`;
+  document.querySelectorAll("tr.today-row").forEach(tr => tr.classList.remove("today-row"));
+  document.querySelectorAll(`tr[data-date="${todayDate}"]`).forEach(tr => tr.classList.add("today-row"));
+}
 
 function refreshWeather() {
-  //wipe all data from the table
-  $('.temperature').html("-</br>°F");
-  $('.precipitation').html("- %</br>(- in)");
-  $('.windspeed').html("-</br>mph");
-
-  //pause...
-  setTimeout(() => {
-    console.log('1 second has passed');
-  }, 1000);
-
-  //grab new data from weather api
   console.log("Updating weather...");
-  destinations.forEach(fetchWeatherData);
-  console.log("Weather update complete.");
+  // Rebuild first, in case a date has passed since the page loaded
+  // (e.g. it's been open across midnight) — this re-applies the
+  // past-date filter and resets every cell to its loading state.
+  buildRows();
+  fetchAll();
+  highlightToday();
+}
 
-  // updating highlighted line in table for "today"
-  $("th").filter(function() {
-    return $(this).text().trim() === todayDate;
-  }).closest("tr").css("background-color", "#7EB752");
-  console.log("Highlighting today's line...");
-};
-
+// --- init ---
+document.getElementById("tz-label").textContent = CONFIG.timezoneLabel || CONFIG.timezone;
+document.getElementById("trip-label").textContent = CONFIG.tripLabel || "";
+assignIds();
+buildRows();
+fetchAll();
+highlightToday();
+setInterval(updateLocalTime, 1000);
 </script>
 
 </body>
