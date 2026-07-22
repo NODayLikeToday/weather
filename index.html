@@ -171,6 +171,8 @@
     .metric strong { display: block; font-size: 1rem; }
     .metric .sub { display: block; font-size: 0.74rem; color: var(--muted); margin-top: 1px; }
 
+    .loc-sun { display: block; font-size: 0.74rem; color: var(--muted); margin-top: 2px; font-weight: 400; }
+
     tr.today-row { position: relative; }
     tr.today-row th, tr.today-row td { background: rgba(227, 165, 66, 0.12); }
     tr.today-row th { box-shadow: inset 4px 0 0 var(--sand); }
@@ -206,7 +208,8 @@
       tr.today-row th { box-shadow: none; border-left: 4px solid var(--sand); padding-left: 10px; margin-left: -14px; padding-top: 2px; }
 
       tbody td { text-align: left; padding: 6px 0; display: flex; justify-content: space-between; align-items: baseline; }
-      tbody td:nth-child(2) { font-weight: 600; padding-top: 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+      tbody td:nth-child(2) { font-weight: 600; padding-top: 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 4px; display: block; }
+      .loc-sun { font-weight: 400; }
 
       td.metric::before {
         content: attr(data-label);
@@ -245,6 +248,7 @@
           <th scope="col">Date</th>
           <th scope="col">Location</th>
           <th scope="col">Temp</th>
+          <th scope="col">Humidity</th>
           <th scope="col">Precip</th>
           <th scope="col">Wind Gusts</th>
         </tr>
@@ -330,8 +334,8 @@ const CONFIG = {
 function buildApiUrl(dest) {
   return "https://api.open-meteo.com/v1/forecast"
     + `?latitude=${dest.lat}&longitude=${dest.lon}`
-    + "&daily=apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,wind_speed_10m_max"
-    + "&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m"
+    + "&daily=apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,wind_speed_10m_max,sunrise,sunset"
+    + "&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,relative_humidity_2m"
     + "&models=best_match&temperature_unit=fahrenheit&precipitation_unit=inch&wind_speed_unit=mph"
     + `&timezone=${encodeURIComponent(CONFIG.timezone)}`
     + `&start_date=${dest.start}&end_date=${dest.end}`;
@@ -400,10 +404,16 @@ function buildRows() {
     tr.appendChild(th);
 
     const locTd = document.createElement("td");
-    locTd.textContent = dest.location;
+    locTd.appendChild(document.createTextNode(dest.location));
+    const sunSpan = document.createElement("span");
+    sunSpan.className = "loc-sun";
+    sunSpan.id = `sun_${dest.id}`;
+    sunSpan.textContent = "Sunrise: -- \u00b7 Sunset: --";
+    locTd.appendChild(sunSpan);
     tr.appendChild(locTd);
 
     tr.appendChild(makeMetricCell("Temp", "temperature", dest.id));
+    tr.appendChild(makeMetricCell("Humidity", "humidity", dest.id));
     tr.appendChild(makeMetricCell("Precip", "precipitation", dest.id));
     tr.appendChild(makeMetricCell("Wind gusts", "windspeed", dest.id));
     tbody.appendChild(tr);
@@ -421,9 +431,15 @@ function buildRows() {
       const em = document.createElement("i");
       em.textContent = extra.location;
       extraLocTd.appendChild(em);
+      const extraSunSpan = document.createElement("span");
+      extraSunSpan.className = "loc-sun";
+      extraSunSpan.id = `sun_${extra.id}`;
+      extraSunSpan.textContent = "Sunrise: -- \u00b7 Sunset: --";
+      extraLocTd.appendChild(extraSunSpan);
       tr2.appendChild(extraLocTd);
 
       tr2.appendChild(makeMetricCell("Temp", "temperature", extra.id));
+      tr2.appendChild(makeMetricCell("Humidity", "humidity", extra.id));
       tr2.appendChild(makeMetricCell("Precip", "precipitation", extra.id));
       tr2.appendChild(makeMetricCell("Wind gusts", "windspeed", extra.id));
       tbody.appendChild(tr2);
@@ -436,6 +452,23 @@ function buildRows() {
 function extractMaxAllowedDate(reason) {
   const match = reason && reason.match(/to (\d{4}-\d{2}-\d{2})/);
   return match ? match[1] : null;
+}
+
+// Open-Meteo returns sunrise/sunset as local wall-clock ISO strings
+// (e.g. "2026-08-23T06:03"), already adjusted for the &timezone= param.
+// We parse the "HH:MM" piece directly instead of going through Date(),
+// which would otherwise reinterpret it in the viewer's own timezone.
+function formatClockTime(isoString) {
+  if (!isoString) return "?";
+  const timePart = isoString.split("T")[1];
+  if (!timePart) return "?";
+  const [hourStr, minStr] = timePart.split(":");
+  let hour = parseInt(hourStr, 10);
+  if (Number.isNaN(hour)) return "?";
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+  return `${hour}:${minStr} ${ampm}`;
 }
 
 async function fetchJson(url) {
@@ -509,15 +542,25 @@ async function fetchWeatherData(dest) {
     const rainProb = round(data.daily?.precipitation_probability_max?.[0]);
     const gust = round(data.daily?.wind_gusts_10m_max?.[0]);
     const windSpeed = round(data.daily?.wind_speed_10m_max?.[0]);
+    const humidity = round(data.current?.relative_humidity_2m);
+    const apparentNow = round(data.current?.apparent_temperature);
+    const sunrise = formatClockTime(data.daily?.sunrise?.[0]);
+    const sunset = formatClockTime(data.daily?.sunset?.[0]);
 
     document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>${tempActual}&deg;F</strong><span class="sub"> Low: ${min} &ndash; High: ${max}&deg;</span></span>`;
+    document.getElementById(`humidity_${id}`).innerHTML = `<span class="metric-value"><strong>${humidity}%</strong><span class="sub">Feels ${apparentNow}&deg;</span></span>`;
     document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>${rainProb}%</strong><span class="sub">${rain} in</span></span>`;
     document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>${gust} mph</strong><span class="sub">${windSpeed} mph sustained</span></span>`;
+    const sunEl = document.getElementById(`sun_${id}`);
+    if (sunEl) sunEl.textContent = `Sunrise: ${sunrise} \u00b7 Sunset: ${sunset}`;
   } catch (error) {
     console.error(`Error loading forecast for ${id}:`, error.message);
     document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>? &deg;F</strong><span class="sub"> Low: ? &ndash; High: ?&deg;</span></span>`;
+    document.getElementById(`humidity_${id}`).innerHTML = `<span class="metric-value"><strong>?%</strong><span class="sub">Feels ?&deg;</span></span>`;
     document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>${rainProb}%</strong><span class="sub">? in</span></span>`;
     document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>${gust} mph</strong><span class="sub">? mph sustained</span></span>`;
+    const sunEl = document.getElementById(`sun_${id}`);
+    if (sunEl) sunEl.textContent = "Sunrise: ? \u00b7 Sunset: ?";
   }
 }
 
