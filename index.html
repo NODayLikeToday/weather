@@ -173,6 +173,18 @@
 
     .loc-sun { display: block; font-size: 0.74rem; color: var(--muted); margin-top: 2px; font-weight: 400; }
 
+    /* Shown on the date cell when the requested forecast date was
+       beyond the provider's range and the app fell back to the
+       farthest available date instead. */
+    .fallback-badge {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 0.85rem;
+      cursor: help;
+      vertical-align: 1px;
+      line-height: 1;
+    }
+
     tr.today-row { position: relative; }
     tr.today-row th, tr.today-row td { background: rgba(227, 165, 66, 0.12); }
     tr.today-row th { box-shadow: inset 4px 0 0 var(--sand); }
@@ -189,6 +201,11 @@
     @media (max-width: 680px) {
       table, thead, tbody, tr, th, td { display: block; }
       thead { display: none; }
+      
+      table {
+        background: none;
+        box-shadow: none;
+      }
 
       tbody tr {
         background: var(--card);
@@ -377,6 +394,7 @@ function allEntries() {
       dest.extraRow.id = `${dest.id}b`;
       dest.extraRow.start = dest.extraRow.start || dest.start;
       dest.extraRow.end = dest.extraRow.end || dest.end;
+      dest.extraRow.dateId = dest.id;
       list.push(dest.extraRow);
     }
   });
@@ -399,6 +417,7 @@ function buildRows() {
 
     const th = document.createElement("th");
     th.scope = "row";
+    th.id = `date_${dest.id}`;
     th.textContent = dest.dateLabel || dest.date;
     if (dest.extraRow) th.rowSpan = 2;
     tr.appendChild(th);
@@ -423,6 +442,9 @@ function buildRows() {
       extra.id = `${dest.id}b`;
       extra.start = extra.start || dest.start;
       extra.end = extra.end || dest.end;
+      // The two rows share a single (rowspan) date cell, so either
+      // leg falling back to an adjusted date should flag that cell.
+      extra.dateId = dest.id;
 
       const tr2 = document.createElement("tr");
       tr2.dataset.date = dest.date;
@@ -444,7 +466,26 @@ function buildRows() {
       tr2.appendChild(makeMetricCell("Wind gusts", "windspeed", extra.id));
       tbody.appendChild(tr2);
     }
+
+    // Refresh the badge on this row's date cell from whatever fallback
+    // state is already known (set by fetchWeatherData on a prior run).
+    refreshFallbackIndicator(dest);
   });
+}
+
+// Recomputes and applies the fallback-date badge for a destination's
+// (possibly shared, via rowspan) date cell, folding in its extraRow
+// leg if present. Safe to call before either leg has fetched yet —
+// it just shows no badge until isFallbackDate is set.
+function refreshFallbackIndicator(dest) {
+  const extra = dest.extraRow;
+  const destFallback = !!dest.isFallbackDate;
+  const extraFallback = !!(extra && extra.isFallbackDate);
+  const originalDates = [
+    destFallback ? dest.originalStart : null,
+    extraFallback ? extra.originalStart : null
+  ].filter(Boolean);
+  setFallbackIndicator(dest.id, destFallback || extraFallback, originalDates.join(" / "));
 }
 
 // Pulls the max allowed date out of an Open-Meteo range error, e.g.
@@ -452,6 +493,30 @@ function buildRows() {
 function extractMaxAllowedDate(reason) {
   const match = reason && reason.match(/to (\d{4}-\d{2}-\d{2})/);
   return match ? match[1] : null;
+}
+
+// Adds or removes the "⚠" badge on a row's date cell, used to flag
+// that the forecast shown is for the farthest available date rather
+// than the actually-requested one. `originalDate` (if given) is shown
+// in the tooltip.
+function setFallbackIndicator(dateId, isFallback, originalDate) {
+  const th = document.getElementById(`date_${dateId}`);
+  if (!th) return;
+  let badge = th.querySelector(".fallback-badge");
+  if (isFallback) {
+    if (!badge) {
+      badge = document.createElement("span");
+      badge.className = "fallback-badge";
+      badge.textContent = "\u26a0";
+      badge.setAttribute("aria-label", "Approximate forecast date");
+      th.appendChild(badge);
+    }
+    badge.title = originalDate
+      ? `Forecast for ${originalDate} isn't available yet — showing the closest available date instead.`
+      : "Showing the closest available forecast date.";
+  } else if (badge) {
+    badge.remove();
+  }
 }
 
 // Open-Meteo returns sunrise/sunset as local wall-clock ISO strings
@@ -514,11 +579,16 @@ async function fetchWeatherData(dest) {
         const adjustedDate = maxDate.toISOString().split('T')[0];
 
         console.warn(`${id}: ${data.reason} — retrying with ${adjustedDate}`);
+        // Remember the date we actually wanted, before overwriting it,
+        // so the UI can say what this row's forecast is standing in for.
+        dest.originalStart = dest.originalStart || dest.start;
+        dest.isFallbackDate = true;
         // Persist the corrected date on the entry so future refreshes
         // (and this run) use it going forward.
         dest.start = adjustedDate;
         dest.end = adjustedDate;
         data = await fetchJson(buildApiUrl(dest));
+        setFallbackIndicator(dest.dateId || id, true, dest.originalStart);
       }
     }
     if (data.error) {
@@ -557,15 +627,28 @@ async function fetchWeatherData(dest) {
     console.error(`Error loading forecast for ${id}:`, error.message);
     document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>? &deg;F</strong><span class="sub"> Low: ? &ndash; High: ?&deg;</span></span>`;
     document.getElementById(`humidity_${id}`).innerHTML = `<span class="metric-value"><strong>?%</strong><span class="sub">Feels ?&deg;</span></span>`;
-    document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>${rainProb}%</strong><span class="sub">? in</span></span>`;
-    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>${gust} mph</strong><span class="sub">? mph sustained</span></span>`;
+    document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>?%</strong><span class="sub">? in</span></span>`;
+    document.getElementById(`windspeed_${id}`).innerHTML = `<span class="metric-value"><strong>? mph</strong><span class="sub">? mph sustained</span></span>`;
     const sunEl = document.getElementById(`sun_${id}`);
     if (sunEl) sunEl.textContent = "Sunrise: ? \u00b7 Sunset: ?";
   }
 }
 
-function fetchAll() {
-  allEntries().forEach(fetchWeatherData);
+async function fetchAll() {
+  const entries = allEntries();
+  await Promise.allSettled(entries.map(fetchWeatherData));
+  updateFallbackFooter(entries);
+}
+
+// After a fetch pass completes, explain the ⚠ badge in the footer,
+// but only when at least one row is actually using a fallback date.
+function updateFallbackFooter(entries) {
+  const footer = document.querySelector("footer.note");
+  if (!footer) return;
+  const anyFallback = entries.some(entry => entry.isFallbackDate);
+  footer.textContent = anyFallback
+    ? "\u26a0 = forecast not yet available"
+    : "";
 }
 
 // Display the current time in CONFIG.timezone
