@@ -1046,6 +1046,16 @@ function locateMe() {
     if (statusEl) statusEl.textContent = "Your browser doesn't support location.";
     return;
   }
+  // iOS Safari (and most modern browsers) refuse geolocation entirely
+  // on a non-secure origin — opening the file directly (file://) or
+  // over plain http:// — rather than surfacing a permission prompt.
+  // Catch that case with a specific message instead of the generic
+  // permission-denied one below, since the fix is different (serve
+  // over https, don't touch Settings).
+  if (window.isSecureContext === false) {
+    if (statusEl) statusEl.textContent = "Location needs this page served over https:// \u2014 it won't work opened as a local file or over http.";
+    return;
+  }
   if (mapState.locateBtn) mapState.locateBtn.classList.add("loading");
 
   navigator.geolocation.getCurrentPosition(
@@ -1077,11 +1087,17 @@ function locateMe() {
       if (statusEl) statusEl.textContent = "";
     },
     (err) => {
-      console.warn("Location unavailable:", err.message);
-      if (statusEl) statusEl.textContent = "Couldn't get your location \u2014 check location permissions.";
+      console.warn("Location unavailable:", err.code, err.message);
+      // err.code: 1 = PERMISSION_DENIED, 2 = POSITION_UNAVAILABLE, 3 = TIMEOUT
+      const messages = {
+        1: "Location permission is off for this site. On iPhone: Settings \u2192 Privacy & Security \u2192 Location Services \u2192 Safari Websites \u2192 While Using the App (also check Location Services is on globally).",
+        2: "Your device couldn't determine a position \u2014 try again once you have a clearer GPS/network signal.",
+        3: "Getting your location timed out \u2014 tap the button again to retry."
+      };
+      if (statusEl) statusEl.textContent = messages[err.code] || "Couldn't get your location \u2014 check location permissions.";
       setLocateBtnState(false, "Show my location");
     },
-    { timeout: 8000 }
+    { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }
   );
 }
 
