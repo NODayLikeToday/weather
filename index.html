@@ -196,6 +196,115 @@
       padding: 18px 16px 0;
     }
 
+    /* --- Map --- */
+    #map-section {
+      max-width: 760px;
+      margin: 0 auto 20px;
+      padding: 0 16px;
+      display: none;
+    }
+
+    #map-section.open { display: block; }
+
+    #map-status {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding: 8px 2px;
+      text-align: center;
+    }
+
+    #map {
+      height: 360px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(18, 42, 51, 0.06), 0 8px 24px rgba(18, 42, 51, 0.06);
+      background: var(--card);
+    }
+
+    /* Current-weather label rendered directly on top of each marker.
+       Popups (bound separately) carry the fuller breakdown. */
+    .temp-marker-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--sea-deep);
+      color: #EAF4F3;
+      border: 2px solid #EAF4F3;
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 0.74rem;
+      white-space: nowrap;
+      padding: 3px 8px;
+      box-shadow: 0 2px 6px rgba(18, 42, 51, 0.35);
+    }
+
+    .temp-marker-pin.fallback-fetching { background: var(--muted); }
+
+    .user-loc-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      pointer-events: none;
+    }
+
+    .user-loc-label {
+      background: var(--sea-deep);
+      color: #EAF4F3;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-radius: 999px;
+      padding: 2px 7px;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(18, 42, 51, 0.35);
+    }
+
+    .user-loc-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--sand);
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 0 0 2px var(--sea-deep), 0 2px 6px rgba(18, 42, 51, 0.4);
+      position: relative;
+    }
+
+    .user-loc-dot::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid var(--sand);
+      animation: user-loc-pulse 1.8s ease-out infinite;
+    }
+
+    @keyframes user-loc-pulse {
+      0% { transform: scale(0.6); opacity: 0.9; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    .weather-popup h4 {
+      margin: 0 0 2px;
+      font-family: 'Fraunces', serif;
+      font-size: 0.95rem;
+      color: var(--sea-deep);
+    }
+    .weather-popup .popup-date {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    .weather-popup dl { margin: 0; font-size: 0.82rem; }
+    .weather-popup dl div { display: flex; justify-content: space-between; gap: 14px; padding: 1px 0; }
+    .weather-popup dt { color: var(--muted); }
+    .weather-popup dd { margin: 0; font-weight: 600; }
+
     /* Below this width, the table becomes a stack of cards so nothing
        has to squeeze horizontally or scroll sideways. */
     @media (max-width: 680px) {
@@ -251,11 +360,17 @@
   <div class="actions">
     <button type="button" class="btn btn-outline" onclick="location.reload()">Refresh Page</button>
     <button type="button" class="btn btn-solid" onclick="refreshWeather()">Refresh Weather</button>
+    <button type="button" class="btn btn-outline" id="map-toggle-btn" onclick="toggleMap()">Show Map</button>
   </div>
 </header>
 <svg class="wave" viewBox="0 0 400 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M0 8 Q 25 18 50 8 T 100 8 T 150 8 T 200 8 T 250 8 T 300 8 T 350 8 T 400 8 V0 H0 Z" fill="#F4F8F7"></path>
 </svg>
+
+<section id="map-section">
+  <div id="map"></div>
+  <div id="map-status"></div>
+</section>
 
 <main>
   <div class="wrap" style="padding:0;">
@@ -395,6 +510,8 @@ function allEntries() {
       dest.extraRow.start = dest.extraRow.start || dest.start;
       dest.extraRow.end = dest.extraRow.end || dest.end;
       dest.extraRow.dateId = dest.id;
+      dest.extraRow.date = dest.extraRow.date || dest.date;
+      dest.extraRow.dateLabel = dest.extraRow.dateLabel || dest.dateLabel;
       list.push(dest.extraRow);
     }
   });
@@ -617,6 +734,12 @@ async function fetchWeatherData(dest) {
     const sunrise = formatClockTime(data.daily?.sunrise?.[0]);
     const sunset = formatClockTime(data.daily?.sunset?.[0]);
 
+    // Kept on the entry (rather than only written to the DOM) so the
+    // map — lazy-loaded and possibly opened before or after this pass —
+    // can render current conditions without a separate fetch.
+    dest.weather = { tempActual, min, max, humidity, apparentNow, rainProb, rain, gust, windSpeed, sunrise, sunset };
+    if (typeof refreshMapMarker === "function") refreshMapMarker(dest);
+
     document.getElementById(`temperature_${id}`).innerHTML = `<span class="metric-value"><strong>${tempActual}&deg;F</strong><span class="sub"> Low: ${min} &ndash; High: ${max}&deg;</span></span>`;
     document.getElementById(`humidity_${id}`).innerHTML = `<span class="metric-value"><strong>${humidity}%</strong><span class="sub">Feels ${apparentNow}&deg;</span></span>`;
     document.getElementById(`precipitation_${id}`).innerHTML = `<span class="metric-value"><strong>${rainProb}%</strong><span class="sub">${rain} in</span></span>`;
@@ -676,6 +799,180 @@ function refreshWeather() {
   buildRows();
   fetchAll();
   highlightToday();
+  pruneMapMarkers();
+}
+
+// Removes markers for any destination hidePastDates has since filtered
+// out of the table (e.g. the trip clock rolled past midnight), so the
+// map doesn't accumulate pins for stops that are no longer shown.
+function pruneMapMarkers() {
+  if (!mapState.map) return;
+  const visibleIds = new Set(allEntries().map((d) => d.id));
+  Object.keys(mapState.markers).forEach((id) => {
+    if (!visibleIds.has(id)) {
+      mapState.map.removeLayer(mapState.markers[id]);
+      delete mapState.markers[id];
+    }
+  });
+}
+
+// ---------------- Map (Leaflet, lazy-loaded) ----------------
+// Nothing map-related (JS, CSS, tiles) is requested until the user taps
+// "Show Map" — the app stays light for low-connectivity use until then.
+let mapState = { loaded: false, loading: null, map: null, markers: {}, userMarker: null };
+
+function toggleMap() {
+  const section = document.getElementById("map-section");
+  const btn = document.getElementById("map-toggle-btn");
+  const opening = !section.classList.contains("open");
+
+  if (!opening) {
+    section.classList.remove("open");
+    btn.textContent = "Show Map";
+    return;
+  }
+
+  section.classList.add("open");
+  btn.textContent = "Hide Map";
+
+  if (mapState.loaded) {
+    // Leaflet measures its container at init time; since the container
+    // was display:none, it needs a nudge now that it's visible again.
+    setTimeout(() => mapState.map && mapState.map.invalidateSize(), 0);
+    return;
+  }
+
+  const statusEl = document.getElementById("map-status");
+  statusEl.textContent = "Loading map\u2026";
+  loadLeaflet()
+    .then(initMap)
+    .then(() => { statusEl.textContent = ""; })
+    .catch((err) => {
+      console.error("Map failed to load:", err);
+      statusEl.textContent = "Map failed to load \u2014 check your connection.";
+    });
+}
+
+function loadLeaflet() {
+  if (mapState.loading) return mapState.loading;
+  mapState.loading = new Promise((resolve, reject) => {
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(css);
+
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Leaflet script failed to load"));
+    document.head.appendChild(script);
+  });
+  return mapState.loading;
+}
+
+function initMap() {
+  mapState.loaded = true;
+  mapState.map = L.map("map", { scrollWheelZoom: false });
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(mapState.map);
+
+  allEntries().forEach(addOrUpdateMarker);
+  fitMapToMarkers();
+  locateUser();
+}
+
+// Small pill showing *current* temperature only, rendered on top of the
+// marker itself. The fuller current-conditions breakdown lives in the
+// popup (see popupHtml) rather than on the map face.
+function tempPinIcon(dest) {
+  const label = dest.weather ? `${dest.weather.tempActual}\u00b0` : "\u2026";
+  const cls = dest.weather ? "temp-marker-pin" : "temp-marker-pin fallback-fetching";
+  return L.divIcon({ className: "", html: `<div class="${cls}">${label}</div>`, iconSize: null, iconAnchor: [18, 12] });
+}
+
+function popupHtml(dest) {
+  const dateText = dest.dateLabel || dest.date || "";
+  const w = dest.weather;
+  if (!w) {
+    return `<div class="weather-popup"><h4>${dest.location}</h4><div class="popup-date">${dateText}</div>Fetching current conditions&hellip;</div>`;
+  }
+  return `<div class="weather-popup">
+    <h4>${dest.location}</h4>
+    <div class="popup-date">${dateText}</div>
+    <dl>
+      <div><dt>Temp</dt><dd>${w.tempActual}&deg;F (feels ${w.apparentNow}&deg;)</dd></div>
+      <div><dt>Humidity</dt><dd>${w.humidity}%</dd></div>
+      <div><dt>Wind gusts</dt><dd>${w.gust} mph</dd></div>
+      <div><dt>Rain chance</dt><dd>${w.rainProb}%</dd></div>
+      <div><dt>Sun</dt><dd>${w.sunrise} &middot; ${w.sunset}</dd></div>
+    </dl>
+  </div>`;
+}
+
+function addOrUpdateMarker(dest) {
+  if (typeof dest.lat !== "number" || typeof dest.lon !== "number") return;
+  if (!mapState.map) return;
+
+  const existing = mapState.markers[dest.id];
+  if (existing) {
+    existing.setIcon(tempPinIcon(dest));
+    existing.setPopupContent(popupHtml(dest));
+    return;
+  }
+
+  const marker = L.marker([dest.lat, dest.lon], { icon: tempPinIcon(dest) })
+    .bindPopup(popupHtml(dest))
+    .addTo(mapState.map);
+  mapState.markers[dest.id] = marker;
+}
+
+// Called from fetchWeatherData as each destination's data comes back.
+// No-ops harmlessly if the map hasn't been opened (and thus loaded) yet.
+function refreshMapMarker(dest) {
+  if (!mapState.map) return;
+  addOrUpdateMarker(dest);
+}
+
+function fitMapToMarkers() {
+  const points = Object.values(mapState.markers).map((m) => m.getLatLng());
+  if (mapState.userMarker) points.push(mapState.userMarker.getLatLng());
+  if (points.length === 0) return;
+  if (points.length === 1) {
+    mapState.map.setView(points[0], 9);
+  } else {
+    mapState.map.fitBounds(L.latLngBounds(points), { padding: [24, 24] });
+  }
+}
+
+function locateUser() {
+  const statusEl = document.getElementById("map-status");
+  if (!navigator.geolocation) {
+    if (statusEl) statusEl.textContent = "Your browser doesn't support location.";
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const latlng = [pos.coords.latitude, pos.coords.longitude];
+      const icon = L.divIcon({
+        className: "",
+        html: '<div class="user-loc-marker"><div class="user-loc-label">You</div><div class="user-loc-dot"></div></div>',
+        iconSize: null,
+        iconAnchor: [8, 8]
+      });
+      mapState.userMarker = L.marker(latlng, { icon, zIndexOffset: 1000 })
+        .bindPopup("Your current location")
+        .addTo(mapState.map)
+        .openPopup();
+      fitMapToMarkers();
+    },
+    (err) => {
+      console.warn("Location unavailable:", err.message);
+      if (statusEl) statusEl.textContent = "Couldn't get your location \u2014 check location permissions.";
+    },
+    { timeout: 8000 }
+  );
 }
 
 // --- init ---
