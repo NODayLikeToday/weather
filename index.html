@@ -241,6 +241,34 @@
 
     .temp-marker-pin.fallback-fetching { background: var(--muted); }
 
+    /* --- "My location" toggle control (in-map button, top-right) --- */
+    .locate-control { margin: 10px 10px 0 0; }
+
+    .locate-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1.5px solid var(--line);
+      background: #FFFFFF;
+      color: var(--sea-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(18, 42, 51, 0.12), 0 4px 10px rgba(18, 42, 51, 0.12);
+      transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+    }
+    .locate-btn:active { transform: scale(0.94); }
+    .locate-btn.active {
+      background: var(--sea-deep);
+      border-color: var(--sea-deep);
+      color: #EAF4F3;
+    }
+    .locate-btn.loading { opacity: 0.6; cursor: wait; }
+
+    /* --- "My location" marker: a little cruise ship with a pulsing wake --- */
     .user-loc-marker {
       display: flex;
       flex-direction: column;
@@ -263,28 +291,40 @@
       box-shadow: 0 2px 6px rgba(18, 42, 51, 0.35);
     }
 
-    .user-loc-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--sand);
-      border: 3px solid #FFFFFF;
-      box-shadow: 0 0 0 2px var(--sea-deep), 0 2px 6px rgba(18, 42, 51, 0.4);
+    .ship-pulse-wrap {
       position: relative;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .user-loc-dot::after {
-      content: "";
+    .ship-pulse-ring {
       position: absolute;
-      inset: -8px;
+      inset: 5px;
       border-radius: 50%;
       border: 2px solid var(--sand);
-      animation: user-loc-pulse 1.8s ease-out infinite;
+      animation: ship-pulse 2.2s ease-out infinite;
+    }
+    .ship-pulse-ring.delay { animation-delay: 1.1s; }
+
+    @keyframes ship-pulse {
+      0% { transform: scale(0.7); opacity: 0.9; }
+      100% { transform: scale(2.1); opacity: 0; }
     }
 
-    @keyframes user-loc-pulse {
-      0% { transform: scale(0.6); opacity: 0.9; }
-      100% { transform: scale(1.8); opacity: 0; }
+    .ship-icon {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      filter: drop-shadow(0 2px 3px rgba(18, 42, 51, 0.45));
+      animation: ship-bob 2.4s ease-in-out infinite;
+    }
+
+    @keyframes ship-bob {
+      0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+      50% { transform: translateY(-2px) rotate(1.5deg); }
     }
 
     .weather-popup h4 {
@@ -819,7 +859,7 @@ function pruneMapMarkers() {
 // ---------------- Map (Leaflet, lazy-loaded) ----------------
 // Nothing map-related (JS, CSS, tiles) is requested until the user taps
 // "Show Map" — the app stays light for low-connectivity use until then.
-let mapState = { loaded: false, loading: null, map: null, markers: {}, userMarker: null };
+let mapState = { loaded: false, loading: null, map: null, markers: {}, userMarker: null, locating: false, locateBtn: null };
 
 function toggleMap() {
   const section = document.getElementById("map-section");
@@ -880,7 +920,29 @@ function initMap() {
 
   allEntries().forEach(addOrUpdateMarker);
   fitMapToMarkers();
-  locateUser();
+  addLocateControl();
+}
+
+// A small button on the map itself (top-right) that toggles the
+// "my location" ship marker on/off — location is never requested
+// automatically, only when the person opts in here.
+function addLocateControl() {
+  const LocateControl = L.Control.extend({
+    options: { position: "topright" },
+    onAdd: function () {
+      const wrapper = L.DomUtil.create("div", "locate-control");
+      const btn = L.DomUtil.create("button", "locate-btn", wrapper);
+      btn.type = "button";
+      btn.setAttribute("aria-pressed", "false");
+      btn.title = "Show my location";
+      btn.textContent = "\ud83d\udea2"; // ship emoji, swapped for the custom SVG on the map marker itself
+      L.DomEvent.disableClickPropagation(wrapper);
+      L.DomEvent.on(btn, "click", toggleLocate);
+      mapState.locateBtn = btn;
+      return wrapper;
+    }
+  });
+  new LocateControl().addTo(mapState.map);
 }
 
 // Small pill showing *current* temperature only, rendered on top of the
@@ -946,33 +1008,92 @@ function fitMapToMarkers() {
   }
 }
 
-function locateUser() {
+// A small stylized cruise ship, drawn with the site's own palette so it
+// reads as "your ship" rather than a generic map pin.
+const SHIP_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3.5 15.5h17l-2 4.2a2 2 0 0 1-1.8 1.15H7.3a2 2 0 0 1-1.8-1.15l-2-4.2Z" fill="#0E4048"/>
+  <rect x="6.5" y="9.5" width="11" height="6" rx="1" fill="#EAF4F3" stroke="#0E4048" stroke-width="1"/>
+  <rect x="8.7" y="10.7" width="2.2" height="2" fill="#1F6F78"/>
+  <rect x="13.1" y="10.7" width="2.2" height="2" fill="#1F6F78"/>
+  <rect x="10" y="5" width="2.4" height="4.7" rx="0.5" fill="#0E4048"/>
+  <rect x="9.4" y="3.2" width="3.6" height="2" rx="0.4" fill="#E3A542"/>
+  <path d="M2 17.3c1 .75 2 .75 3 0s2 .75 3 0 2 .75 3 0 2 .75 3 0 2 .75 3 0 2 .75 3 0" stroke="#1F6F78" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+</svg>`;
+
+function toggleLocate() {
+  if (mapState.locating) {
+    unlocateMe();
+  } else {
+    locateMe();
+  }
+}
+
+function setLocateBtnState(active, title) {
+  const btn = mapState.locateBtn;
+  if (!btn) return;
+  btn.classList.remove("loading");
+  btn.classList.toggle("active", active);
+  btn.setAttribute("aria-pressed", String(active));
+  btn.title = title;
+}
+
+// Requests location only when the user taps the map's locate button —
+// never automatically — then pans/zooms to it (Leaflet zoom level 7)
+// and drops a pulsing cruise-ship marker.
+function locateMe() {
   const statusEl = document.getElementById("map-status");
   if (!navigator.geolocation) {
     if (statusEl) statusEl.textContent = "Your browser doesn't support location.";
     return;
   }
+  if (mapState.locateBtn) mapState.locateBtn.classList.add("loading");
+
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const latlng = [pos.coords.latitude, pos.coords.longitude];
+      if (mapState.userMarker) mapState.map.removeLayer(mapState.userMarker);
+
       const icon = L.divIcon({
         className: "",
-        html: '<div class="user-loc-marker"><div class="user-loc-label">You</div><div class="user-loc-dot"></div></div>',
+        html: `<div class="user-loc-marker">
+                 <div class="ship-pulse-wrap">
+                   <span class="ship-pulse-ring"></span>
+                   <span class="ship-pulse-ring delay"></span>
+                   <span class="ship-icon">${SHIP_SVG}</span>
+                 </div>
+                 <div class="user-loc-label">You</div>
+               </div>`,
         iconSize: null,
-        iconAnchor: [8, 8]
+        iconAnchor: [17, 17]
       });
       mapState.userMarker = L.marker(latlng, { icon, zIndexOffset: 1000 })
         .bindPopup("Your current location")
         .addTo(mapState.map)
         .openPopup();
-      fitMapToMarkers();
+
+      mapState.map.setView(latlng, 7, { animate: true });
+      mapState.locating = true;
+      setLocateBtnState(true, "Hide my location");
+      if (statusEl) statusEl.textContent = "";
     },
     (err) => {
       console.warn("Location unavailable:", err.message);
       if (statusEl) statusEl.textContent = "Couldn't get your location \u2014 check location permissions.";
+      setLocateBtnState(false, "Show my location");
     },
     { timeout: 8000 }
   );
+}
+
+// Removes the ship marker and hands the view back to the destinations.
+function unlocateMe() {
+  if (mapState.userMarker) {
+    mapState.map.removeLayer(mapState.userMarker);
+    mapState.userMarker = null;
+  }
+  mapState.locating = false;
+  setLocateBtnState(false, "Show my location");
+  fitMapToMarkers();
 }
 
 // --- init ---
